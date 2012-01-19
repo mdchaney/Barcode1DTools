@@ -1,0 +1,6 @@
+UNDER DEVELOPMENT
+
+This is an implementation of 1D barcodes in Ruby.  There is currently a
+fairly complete Perl implementation at:
+
+https://github.com/mdchaney/barcodes
