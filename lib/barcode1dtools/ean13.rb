@@ -112,7 +112,7 @@ module Barcode1DTools
   # bottom of the barcode, or the center of the text may be aligned with the
   # bottom of the barcode.
 
-  class EAN13
+  class EAN13 < Barcode1D
 
     # patterns to create the bar codes:
 
@@ -229,11 +229,6 @@ module Barcode1DTools
         raise UnencodableCharactersError unless self.can_encode?(value)
         md = value.match(/^(\d+?)(\d)$/)
         self.generate_check_digit_for(md[1]) == md[2].to_i
-      end
-
-      def rle_to_bars(rle_str)
-        str=0
-        rle_str.split('').inject('') { |a,c| str = 1 - str; a + (str.to_s * c.to_i) }
       end
 
     end

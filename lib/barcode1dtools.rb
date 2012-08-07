@@ -30,6 +30,17 @@ module Barcode1DTools
   class ChecksumError < Barcode1DError; end
   class NotImplementedError < Barcode1DError; end
 
+  class Barcode1D
+    class << self
+
+      # Generate bar pattern string from rle string
+      def rle_to_bars(rle_str)
+        str=0
+        rle_str.split('').inject('') { |a,c| str = 1 - str; a + (str.to_s * c.to_i) }
+      end
+
+    end
+  end
 end
 
 require 'barcode1dtools/interleaved2of5'

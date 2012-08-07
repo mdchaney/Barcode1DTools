@@ -59,7 +59,8 @@ module Barcode1DTools
   # while 7 is "nnnww" (7 + 0).  More information is available on
   # Wikipedia.
 
-  class Interleaved2of5
+  class Interleaved2of5 < Barcode1D
+
     # patterns and such go here
     PATTERNS = {
       'start' => 'nnnn',
@@ -117,10 +118,6 @@ module Barcode1DTools
         self.generate_check_digit_for(md[1]) == md[2].to_i
       end
 
-      def rle_to_bars(rle_str)
-        str=0
-        rle_str.split('').inject('') { |a,c| str = 1 - str; a + (str.to_s * c.to_i) }
-      end
     end
 
     # Options are :line_character, :space_character, :w_character,
