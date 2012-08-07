@@ -1,9 +1,15 @@
 UNDER DEVELOPMENT
 
-This is an implementation of 1D barcodes in Ruby.  There is currently a
-fairly complete Perl implementation at:
+This is an implementation of 1D barcodes in Ruby.  Code currently works
+to generate Interleaved 2 of 5 (I 2/5) and EAN-13 (also UPC-A) code
+types.  The complete library is under development, but this code works
+fine.  I will add more codes and unit tests for each as time permits.
+
+There is currently a fairly complete Perl implementation at:
 
 https://github.com/mdchaney/barcodes
+
+I believe those work fine, but consider it legacy code.
 
 Copyright 2012 Michael Chaney Consulting Corporation, All Rights Reserved
 
