@@ -1,6 +1,6 @@
-module Barcode1D
+module Barcode1DTools
 
-  # Barcode::EAN_13 - Create pattern for EAN-13 barcodes
+  # Barcode1DTools::EAN_13 - Create pattern for EAN-13 barcodes
   
   # The value encoded is an
   # integer, and a checksum digit will be added.  You can add the option
@@ -11,11 +11,11 @@ module Barcode1D
   # # manufacturer's code of "28999", product code of "00682", and a
   # # checksum of "3" (not included)
   # num = 82899900682
-  # bc = Barcode1D::EAN13.new(num)
+  # bc = Barcode1DTools::EAN13.new(num)
   # pattern = bc.bars
   # rle_pattern = bc.rle
   # width = bc.width
-  # check_digit = Barcode1D::EAN13.generate_check_digit_for(num)
+  # check_digit = Barcode1DTools::EAN13.generate_check_digit_for(num)
   #
   # The object created is immutable.
   #
@@ -51,7 +51,7 @@ module Barcode1D
   # MISCELLANEOUS INFORMATION
   # 
   # An EAN-13 with an initial "number system" digit of "0" is a UPC-A.
-  # The Barcode::UPC_A module actually just uses this EAN13 module.
+  # The BarcodeTools::UPC_A module actually just uses this EAN13 module.
   # 
   # A EAN-13 barcode has 4 elements:
   # 1. A two-digit "number system" designation

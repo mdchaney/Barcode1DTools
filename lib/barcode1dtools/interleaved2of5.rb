@@ -1,6 +1,6 @@
-module Barcode1D
+module Barcode1DTools
 
-  # Barcode::Interleaved2of5 - Create pattern for Interleaved 2 of 5
+  # Barcode1DTools::Interleaved2of5 - Create pattern for Interleaved 2 of 5
   # (also known as I 2/5 or ITF) barcodes.  The value encoded is an
   # integer, and a checksum digit will be added.  You can add the option
   # :checksum_included => true when initializing to specify that you
@@ -14,16 +14,16 @@ module Barcode1D
   # digits.  The 0 has no effect on the checksum.
   #
   # num = 238982
-  # bc = Barcode1D::Interleaved2of5.new(num)
+  # bc = Barcode1DTools::Interleaved2of5.new(num)
   # pattern = bc.bars
   # rle_pattern = bc.rle
   # wn_pattern = bc.wn
   # width = bc.width
-  # check_digit = Barcode1D::Interleaved2of5.generate_check_digit_for(num)
+  # check_digit = Barcode1DTools::Interleaved2of5.generate_check_digit_for(num)
   #
   # The object created is immutable.
   #
-  # Barcode1D::Interleaved2of5 creates the patterns that you need to
+  # Barcode1DTools::Interleaved2of5 creates the patterns that you need to
   # display Interleaved 2 of 5 (also known as I 2/5) barcodes.
   #
   # I 2/5 barcodes consist of lines and spaces that are either "wide" or
