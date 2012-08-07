@@ -9,5 +9,6 @@ module Barcode1D
   class ValueTooShortError < UnencodableError; end
   class UnencodableCharactersError < UnencodableError; end
   class ChecksumError < Barcode1DError; end
+  class NotImplementedError < Barcode1DError; end
 
 end
