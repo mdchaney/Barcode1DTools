@@ -4,3 +4,8 @@ This is an implementation of 1D barcodes in Ruby.  There is currently a
 fairly complete Perl implementation at:
 
 https://github.com/mdchaney/barcodes
+
+Copyright 2012 Michael Chaney Consulting Corporation, All Rights Reserved
+
+Released under the terms of the MIT License or the GPL version 2
+license.
