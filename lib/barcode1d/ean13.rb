@@ -1,5 +1,3 @@
-require 'barcode1d'
-
 module Barcode1D
 
   # Barcode::EAN_13 - Create pattern for EAN-13 barcodes
@@ -238,8 +236,6 @@ module Barcode1D
         rle_str.split('').inject('') { |a,c| str = 1 - str; a + (str.to_s * c.to_i) }
       end
 
-      def bars_to_rle(bar_str)
-      end
     end
 
     # Options are :line_character, :space_character, :w_character,
