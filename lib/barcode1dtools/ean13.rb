@@ -10,7 +10,7 @@ module Barcode1DTools
   # # Note that this number is a UPC-A, with the number system of 08,
   # # manufacturer's code of "28999", product code of "00682", and a
   # # checksum of "3" (not included)
-  # num = 82899900682
+  # num = '082899900682'
   # bc = Barcode1DTools::EAN13.new(num)
   # pattern = bc.bars
   # rle_pattern = bc.rle
