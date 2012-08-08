@@ -27,11 +27,14 @@ module Barcode1DTools
   #  1. checksum_included - The checksum is included in the value
   #     and does not need to be generated.  This checksum will be
   #     validated and an error raised if it is not proper.
-  #  2. line_character, space_character - when generating a bar
+  #  2. skip_checksum - Do not include a checksum if it is optional.
+  #     This option is not applicable to most barcode types and
+  #     will be ignored unless it is applicable.
+  #  3. line_character, space_character - when generating a bar
   #     pattern, determines the characters which will represent bars
   #     and spaces in the pattern.  These default to "1" for lines and
   #     "0" for spaces.
-  #  3. w_character, n_character - When generating a w/n pattern,
+  #  4. w_character, n_character - When generating a w/n pattern,
   #     determines the characters to be used for wide and narrow
   #     bars and spaces.  Defaults to "w" and "n".  Not applicable to
   #     all barcode types.
