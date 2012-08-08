@@ -47,6 +47,7 @@ module Barcode1DTools
   #     This is an integer.
   #  3. Barcode1D#encoded_string - The entire literal value that is
   #     encoded, including check digit(s).
+  #  4. Barcode1D#options - The options passed to the initializer.
 
 
   # Errors for barcodes
@@ -63,6 +64,7 @@ module Barcode1DTools
     attr_reader :check_digit
     attr_reader :value
     attr_reader :encoded_string
+    attr_reader :options
 
     class << self
 
