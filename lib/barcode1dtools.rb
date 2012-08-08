@@ -34,9 +34,9 @@ module Barcode1DTools
     class << self
 
       # Generate bar pattern string from rle string
-      def rle_to_bars(rle_str)
+      def rle_to_bars(rle_str, options)
         str=0
-        rle_str.split('').inject('') { |a,c| str = 1 - str; a + (str.to_s * c.to_i) }
+        rle_str.split('').inject('') { |a,c| str = 1 - str; a + (str.to_s * c.to_i) }.tr('01', options[:space_character].to_s + options[:line_character].to_s)
       end
 
     end

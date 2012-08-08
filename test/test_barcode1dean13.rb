@@ -33,10 +33,6 @@ class Barcode1DToolsEAN13Test < Test::Unit::TestCase
     assert_equal '0884088516338', ean.encoded_string
   end
 
-  def test_rle_to_bars
-    assert_equal '111001', Barcode1DTools::EAN13.rle_to_bars('321')
-  end
-
   def test_checksum_error
     # proper checksum is 8
     assert_raise(Barcode1DTools::ChecksumError) { Barcode1DTools::EAN13.new('0884088516331', :checksum_included => true) }

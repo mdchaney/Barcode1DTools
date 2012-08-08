@@ -160,7 +160,7 @@ module Barcode1DTools
 
     # returns 1s and 0s (for "black" and "white")
     def bars
-      @bars ||= self.class.rle_to_bars(self.rle).tr('01', @options[:space_character].to_s + @options[:line_character].to_s)
+      @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
     # returns the total unit width of the bar code
