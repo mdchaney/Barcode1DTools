@@ -86,10 +86,6 @@ module Barcode1DTools
       :space_character => '0'
     }
 
-    attr_reader :check_digit
-    attr_reader :value
-    attr_reader :encoded_string
-
     class << self
       # returns true or false
       def can_encode?(value)

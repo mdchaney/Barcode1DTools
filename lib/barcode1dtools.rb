@@ -59,6 +59,11 @@ module Barcode1DTools
   class NotImplementedError < Barcode1DError; end
 
   class Barcode1D
+
+    attr_reader :check_digit
+    attr_reader :value
+    attr_reader :encoded_string
+
     class << self
 
       # Generate bar pattern string from rle string
