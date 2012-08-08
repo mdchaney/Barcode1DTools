@@ -27,7 +27,7 @@ class Barcode1DToolsEAN13Test < Test::Unit::TestCase
   end
 
   def test_value_fixup
-    ean = Barcode1DTools::EAN13.new('88408851633', :checksum_included => false)
+    ean = Barcode1DTools::EAN13.new('088408851633', :checksum_included => false)
     assert_equal 8, ean.check_digit
     assert_equal '088408851633', ean.value
     assert_equal '0884088516338', ean.encoded_string

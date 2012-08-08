@@ -209,15 +209,21 @@ module Barcode1DTools
     attr_reader :product_code
 
     class << self
-      # returns true or false - must be 11-13 digits
-      def can_encode?(value)
-        value.to_s =~ /^[0-9]{11,13}$/
+      # returns true or false - must be 12-13 digits
+      def can_encode?(value, options = nil)
+        if !options
+          value.to_s =~ /^[0-9]{12,13}$/
+        elsif (options[:checksum_included])
+          value.to_s =~ /^[0-9]{13}$/
+        else
+          value.to_s =~ /^[0-9]{12}$/
+        end
       end
 
       # Generates check digit given a string to encode.  It assumes there
       # is no check digit on the "value".
       def generate_check_digit_for(value)
-        raise UnencodableCharactersError unless self.can_encode?(value)
+        raise UnencodableCharactersError unless self.can_encode?(value, :checksum_included => false)
         mult = 3
         value = value.split('').inject(0) { |a,c| mult = 4 - mult ; a + c.to_i * mult }
         10 - (value % 10)
@@ -226,8 +232,8 @@ module Barcode1DTools
       # validates the check digit given a string - assumes check digit
       # is last digit of string.
       def validate_check_digit_for(value)
-        raise UnencodableCharactersError unless self.can_encode?(value)
-        md = value.match(/^(\d+?)(\d)$/)
+        raise UnencodableCharactersError unless self.can_encode?(value, :checksum_included => true)
+        md = value.match(/^(\d{12})(\d)$/)
         self.generate_check_digit_for(md[1]) == md[2].to_i
       end
 
@@ -244,14 +250,12 @@ module Barcode1DTools
 
       if @options[:checksum_included]
         @encoded_string = value.to_s
-        @encoded_string = "0" * (13-@encoded_string.size) + @encoded_string if @encoded_string.size < 13
         raise ChecksumError unless self.class.validate_check_digit_for(@encoded_string)
         md = @encoded_string.match(/^(\d+?)(\d)$/)
         @value, @check_digit = md[1], md[2].to_i
       else
         # need to add a checksum
         @value = value.to_s
-        @value = "0" * (12-@value.size) + @value if @value.size < 12
         @check_digit = self.class.generate_check_digit_for(@value)
         @encoded_string = "#{@value}#{@check_digit}"
       end
