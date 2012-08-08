@@ -239,8 +239,8 @@ module Barcode1DTools
 
     end
 
-    # Options are :line_character, :space_character, :w_character,
-    # :n_character, and :checksum_included.
+    # Options are :line_character, :space_character, and
+    # :checksum_included.
     def initialize(value, options = {})
 
       @options = DEFAULT_OPTIONS.merge(options)
