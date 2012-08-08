@@ -246,7 +246,7 @@ module Barcode1DTools
       @options = DEFAULT_OPTIONS.merge(options)
 
       # Can we encode this value?
-      raise UnencodableCharactersError unless self.class.can_encode?(value)
+      raise UnencodableCharactersError unless self.class.can_encode?(value, @options)
 
       if @options[:checksum_included]
         @encoded_string = value.to_s
