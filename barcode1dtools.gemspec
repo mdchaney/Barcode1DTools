@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = <<-EOF
     Barcode1D is a small library of generators for many kinds of
     1-dimensional barcodes.  Currently implemented are
-    Interleaved 2 of 5 and EAN-13.  Patterns are created in
+    Interleaved 2 of 5, EAN-13, and UPC-A.  Patterns are created in
     either a simple format of 1s and 0s or as a run-length encoded
     string.  This only generates the patterns; actual display must be
     implemented by the programmer.

@@ -9,9 +9,9 @@ module Barcode1DTools
   #
   # Barcode1DTools is a library for generating 1-dimensional
   # barcode patterns for various code types.  The library
-  # currently includes EAN-13 and Interleaved 2 of 5 (I 2/5),
-  # but will be expanded to include most 1D barcode types in
-  # the near future.
+  # currently includes EAN-13, UPC-A, and Interleaved 2 of 5
+  # (I 2/5), but will be expanded to include most 1D
+  # symbologies in the near future.
   #
   #== Example
   #  ean13 = Barcode1DTools::EAN13.new('0012676510226', :line_character => 'x', :space_character => ' ')
