@@ -271,8 +271,7 @@ module Barcode1DTools
         @rle
       else
         md = @encoded_string.match(/^(\d)(\d{6})(\d{6})/)
-        parity_digit, left_half, right_half = md[1], md[2], md[3]
-        @rle = (SIDE_GUARD_PATTERN_RLE + (0..5).collect { |n| LEFT_PATTERNS_RLE[left_half[n,1]][LEFT_PARITY_PATTERNS[parity_digit][n,1]] }.join('') + MIDDLE_GUARD_PATTERN_RLE + right_half.split('').collect { |c| RIGHT_PATTERNS_RLE[c] }.join('') + SIDE_GUARD_PATTERN_RLE)
+        @rle = gen_rle(md[1], md[2], md[3])
       end
     end
 
@@ -284,6 +283,12 @@ module Barcode1DTools
     # returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
+    end
+
+    private
+
+    def gen_rle(parity_digit, left_half, right_half)
+      (SIDE_GUARD_PATTERN_RLE + (0..5).collect { |n| LEFT_PATTERNS_RLE[left_half[n,1]][LEFT_PARITY_PATTERNS[parity_digit][n,1]] }.join('') + MIDDLE_GUARD_PATTERN_RLE + right_half.split('').collect { |c| RIGHT_PATTERNS_RLE[c] }.join('') + SIDE_GUARD_PATTERN_RLE)
     end
 
   end

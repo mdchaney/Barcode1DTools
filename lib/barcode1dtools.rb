@@ -80,3 +80,4 @@ end
 
 require 'barcode1dtools/interleaved2of5'
 require 'barcode1dtools/ean13'
+require 'barcode1dtools/upc_a'
