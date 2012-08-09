@@ -47,6 +47,11 @@ class Barcode1DToolsEAN13Test < Test::Unit::TestCase
     assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::EAN13.new('01234567890123', :checksum_included => true) }
   end
 
+  def test_bad_character_errors
+    # Characters that cannot be encoded
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::EAN13.new('thisisnotgood', :checksum_included => false) }
+  end
+
   def test_width
     ean = Barcode1DTools::EAN13.new('0041343005796', :checksum_included => true)
     assert_equal 95, ean.width
