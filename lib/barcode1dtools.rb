@@ -74,6 +74,11 @@ module Barcode1DTools
         rle_str.split('').inject('') { |a,c| str = 1 - str; a + (str.to_s * c.to_i) }.tr('01', (options[:space_character] || '0').to_s + (options[:line_character] || '1').to_s)
       end
 
+      # Generate rle pattern from bar string
+      def bars_to_rle(bar_str, options = {})
+        bar_str.scan(/(.)(\1*)/).collect { |char,rest| 1+rest.length }.join
+      end
+
     end
   end
 end
