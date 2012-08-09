@@ -85,6 +85,14 @@ module Barcode1DTools
         self.generate_check_digit_for(md[1]) == md[2].to_i
       end
 
+      def decode(value)
+        ean = super(value)
+        if ean.value[0,1] == '0'
+          new(ean.value[1,11])
+        else
+          raise UnencodableCharactersError
+        end
+      end
     end
 
     # Options are :line_character, :space_character, and

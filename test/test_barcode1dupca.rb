@@ -8,6 +8,11 @@ class Barcode1DToolsUPC_ATest < Test::Unit::TestCase
   def teardown
   end
 
+  # Creates a random UPC-A sans checksum
+  def random_11_digit_number
+    (0..10).collect { |x| ((rand * 10).to_i % 10).to_s }.join
+  end
+
   def test_checksum_generation
     assert_equal 7, Barcode1DTools::UPC_A.generate_check_digit_for('07820601001')
   end
@@ -66,5 +71,25 @@ class Barcode1DToolsUPC_ATest < Test::Unit::TestCase
   def test_wn_raises_error
     upc_a = Barcode1DTools::UPC_A.new('012676510226', :checksum_included => true)
     assert_raise(Barcode1DTools::NotImplementedError) { upc_a.wn }
+  end
+
+  def test_decode_error
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::UPC_A.decode('x') }
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::UPC_A.decode('x'*60) }
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::UPC_A.decode('x'*96) }
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::UPC_A.decode('x'*94) }
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::UPC_A.decode('111000011111000011111') }
+  end
+
+  def test_decoding
+    random_ean_num=random_11_digit_number
+    ean = Barcode1DTools::UPC_A.new(random_ean_num)
+    ean2 = Barcode1DTools::UPC_A.decode(ean.bars)
+    assert_equal ean.value, ean2.value
+    ean3 = Barcode1DTools::UPC_A.decode(ean.rle)
+    assert_equal ean.value, ean3.value
+    # Should also work in reverse
+    ean4 = Barcode1DTools::UPC_A.decode(ean.bars.reverse)
+    assert_equal ean.value, ean4.value
   end
 end

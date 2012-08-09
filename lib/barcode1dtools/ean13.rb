@@ -318,7 +318,7 @@ module Barcode1DTools
         #puts "Right digits: #{right_digits} Right parity: #{right_parity_sequence}"
         #puts "Parity: #{parity_digit}"
 
-        new(parity_digit + left_digits + right_digits, :checksum_included => true)
+        EAN13.new(parity_digit + left_digits + right_digits, :checksum_included => true)
       end
     end
 
