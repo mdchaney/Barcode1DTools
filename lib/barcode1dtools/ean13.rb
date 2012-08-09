@@ -233,6 +233,93 @@ module Barcode1DTools
         self.generate_check_digit_for(md[1]) == md[2].to_i
       end
 
+      # Decode a string representing an rle or bar pattern EAN-13.
+      # Note that the string might be backward or forward.  This
+      # will return an EAN13 object.
+      def decode(str)
+        if str.length == 95
+          # bar pattern
+          str = bars_to_rle(str)
+        elsif str.length == 59
+          # rle
+        else
+          raise UnencodableCharactersError, "Pattern must be 95 unit bar pattern or 39 character rle."
+        end
+
+        # Check the guard patterns
+        unless str[0..2] == SIDE_GUARD_PATTERN_RLE && str[56..58] == SIDE_GUARD_PATTERN_RLE && str[27..31] == MIDDLE_GUARD_PATTERN_RLE
+          raise UnencodableCharactersError, "Missing or incorrect guard patterns"
+        end
+
+        # Now I have an rle pattern, simply need to decode
+        # according to the LEFT_PATTERNS_RLE, keeping track
+        # of the parity for each position.
+
+        # Set up the decoder
+        left_parity_sequence = ''
+        left_digits = ''
+        right_parity_sequence = ''
+        right_digits = ''
+        left_initial_offset = SIDE_GUARD_PATTERN_RLE.length
+        right_initial_offset = SIDE_GUARD_PATTERN_RLE.length + (4*6) + MIDDLE_GUARD_PATTERN_RLE.length
+
+        # Decode the left side
+        (0..5).each do |left_offset|
+          found = false
+          digit_rle = str[(left_initial_offset + left_offset*4),4]
+          ['o','e'].each do |parity|
+            ('0'..'9').each do |digit|
+              if LEFT_PATTERNS_RLE[digit][parity] == digit_rle
+                left_parity_sequence += parity
+                left_digits += digit
+                found = true
+                break
+              end
+            end
+          end
+          raise UndecodableCharactersError, "Invalid sequence: #{digit_rle}" unless found
+        end
+
+        # Decode the right side
+        (0..5).each do |right_offset|
+          found = false
+          digit_rle = str[(right_initial_offset + right_offset*4),4]
+          ['o','e'].each do |parity|
+            ('0'..'9').each do |digit|
+              if LEFT_PATTERNS_RLE[digit][parity] == digit_rle
+                right_parity_sequence += parity
+                right_digits += digit
+                found = true
+                break
+              end
+            end
+          end
+          raise UndecodableCharactersError, "Invalid sequence: #{digit_rle}" unless found
+        end
+
+        # If left parity sequence is 'eeeeee', the string is reversed
+        if left_parity_sequence == 'eeeeee'
+          left_digits, right_digits, left_parity_sequence = right_digits.reverse, left_digits.reverse, right_parity_sequence.reverse.tr('eo','oe')
+        end
+
+        # Now, find the parity digit
+        parity_digit = nil
+        ('0'..'9').each do |x|
+          if LEFT_PARITY_PATTERNS[x] == left_parity_sequence
+            parity_digit = x
+            break
+          end
+        end
+
+        raise UndecodableCharactersError, "Weird parity: #{left_parity_sequence}" unless parity_digit
+
+        # Debugging
+        #puts "Left digits: #{left_digits} Left parity: #{left_parity_sequence}"
+        #puts "Right digits: #{right_digits} Right parity: #{right_parity_sequence}"
+        #puts "Parity: #{parity_digit}"
+
+        new(parity_digit + left_digits + right_digits, :checksum_included => true)
+      end
     end
 
     # Options are :line_character, :space_character, and

@@ -8,6 +8,11 @@ class Barcode1DToolsEAN13Test < Test::Unit::TestCase
   def teardown
   end
 
+  # Creates a random EAN-13 sans checksum
+  def random_12_digit_number
+    (0..11).collect { |x| ((rand * 10).to_i % 10).to_s }.join
+  end
+
   def test_checksum_generation
     assert_equal 7, Barcode1DTools::EAN13.generate_check_digit_for('007820601001')
   end
@@ -66,5 +71,25 @@ class Barcode1DToolsEAN13Test < Test::Unit::TestCase
   def test_wn_raises_error
     ean = Barcode1DTools::EAN13.new('0012676510226', :checksum_included => true)
     assert_raise(Barcode1DTools::NotImplementedError) { ean.wn }
+  end
+
+  def test_decode_error
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::EAN13.decode('x') }
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::EAN13.decode('x'*60) }
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::EAN13.decode('x'*96) }
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::EAN13.decode('x'*94) }
+    assert_raise(Barcode1DTools::UnencodableCharactersError) { Barcode1DTools::EAN13.decode('111000011111000011111') }
+  end
+
+  def test_decoding
+    random_ean_num=random_12_digit_number
+    ean = Barcode1DTools::EAN13.new(random_ean_num)
+    ean2 = Barcode1DTools::EAN13.decode(ean.bars)
+    assert_equal ean.value, ean2.value
+    ean3 = Barcode1DTools::EAN13.decode(ean.rle)
+    assert_equal ean.value, ean3.value
+    # Should also work in reverse
+    ean4 = Barcode1DTools::EAN13.decode(ean.bars.reverse)
+    assert_equal ean.value, ean4.value
   end
 end

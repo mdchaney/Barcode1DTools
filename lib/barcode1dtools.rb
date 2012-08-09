@@ -58,6 +58,7 @@ module Barcode1DTools
   class UnencodableCharactersError < UnencodableError; end
   class ChecksumError < Barcode1DError; end
   class NotImplementedError < Barcode1DError; end
+  class UndecodableCharactersError < Barcode1DError; end
 
   class Barcode1D
 
