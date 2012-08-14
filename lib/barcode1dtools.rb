@@ -73,7 +73,7 @@ module Barcode1DTools
       # Generate bar pattern string from rle string
       def rle_to_bars(rle_str, options = {})
         str=0
-        rle_str.split('').inject('') { |a,c| str = 1 - str; a + (str.to_s * c.to_i) }.tr('01', (options[:space_character] || '0').to_s + (options[:line_character] || '1').to_s)
+        rle_str.split('').inject('') { |a,c| str = 1 - str; a + (str.to_s * c.to_i) }.tr('01', bar_pair(options))
       end
 
       # Generate rle pattern from bar string
@@ -81,6 +81,25 @@ module Barcode1DTools
         bar_str.scan(/(.)(\1*)/).collect { |char,rest| 1+rest.length }.join
       end
 
+      # Generate rle pattern from wn string
+      def wn_to_rle(wn_str, options = {})
+        wn_str.tr(wn_pair(options), (options[:wn_ratio] || 2).to_s + '1')
+      end
+
+      # Generate wn pattern from rle string
+      def rle_to_wn(rle_str, options = {})
+        rle_str.tr('123456789', 'nwwwwwwww').tr('wn', wn_pair(options))
+      end
+
+      # Get an "wn" pair from the options
+      def wn_pair(options = {})
+        (options[:w_character] || 'w') + (options[:n_character] || 'n')
+      end
+
+      # Get a bar pair from the options
+      def bar_pair(options = {})
+        (options[:space_character] || '0').to_s + (options[:line_character] || '1').to_s
+      end
     end
   end
 end
