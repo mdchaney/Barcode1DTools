@@ -11,7 +11,9 @@ module Barcode1DTools
   #
   # I 2/5 can only encode an even number of digits (including the
   # checksum), so a "0" will be prepended if there is an odd number of
-  # digits.  The 0 has no effect on the checksum.
+  # digits.  The 0 has no effect on the checksum.  Note that sometimes
+  # an odd number of digits is encoded with 5 narrow spaces for the last
+  # digit.  We do not encode this way but can handle decoding.
   #
   # num = 238982
   # bc = Barcode1DTools::Interleaved2of5.new(num)
@@ -83,7 +85,8 @@ module Barcode1DTools
       :w_character => 'w',
       :n_character => 'n',
       :line_character => '1',
-      :space_character => '0'
+      :space_character => '0',
+      :wn_ratio => WN_RATIO
     }
 
     class << self
@@ -108,12 +111,66 @@ module Barcode1DTools
       # is last digit of string.
       def validate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value)
-        value = value.to_i.to_s
-        value = "0#{value}" if value.size.odd?
-        md = value.match(/^(\d(?:\d\d)+)(\d)$/)
+        md = value.to_s.match(/^(\d+)(\d)$/)
         self.generate_check_digit_for(md[1]) == md[2].to_i
       end
 
+      # Decode a string in wn format.  This will return an Interleaved2of5
+      # object.
+      def decode(str, options = {})
+        if str =~ /[^wn]/
+          raise UnencodableCharactersError, "Pattern must contain only \"w\" and \"n\"."
+        end
+
+        if str.reverse =~ /^#{PATTERNS['start']}.*?#{PATTERNS['stop']}$/
+          str.reverse!
+        end
+
+        unless str =~ /^#{PATTERNS['start']}(.*?)#{PATTERNS['stop']}$/
+          raise UnencodableCharactersError, "Start/stop pattern is not detected."
+        end
+
+        numeric_pattern = $1
+
+        unless numeric_pattern.size % 10 == 0
+          raise UnencodableCharactersError, "Wrong number of bars."
+        end
+
+        decoded_string = ''
+
+        numeric_pattern.scan(/(.{10})/).each do |chunk|
+          chunk = chunk[0]
+
+          num1 = chunk[0,1] + chunk[2,1] + chunk[4,1] + chunk[6,1] + chunk[8,1]
+          num2 = chunk[1,1] + chunk[3,1] + chunk[5,1] + chunk[7,1] + chunk[9,1]
+
+          found = false
+          ('0'..'9').each do |digit|
+            if PATTERNS[digit] == num1
+              decoded_string += digit
+              found = true
+            end
+          end
+
+          raise UndecodableCharactersError, "Invalid sequence: #{num1}" unless found
+
+          # nnnnn is a sequence sometimes used in the spaces of the last
+          # digit to indicate there is no last digit.
+          if num2 != 'nnnnn'
+            found = false
+            ('0'..'9').each do |digit|
+              if PATTERNS[digit] == num2
+                decoded_string += digit
+                found = true
+              end
+            end
+
+            raise UndecodableCharactersError, "Invalid sequence: #{num2}" unless found
+          end
+        end
+
+        Interleaved2of5.new(decoded_string.to_i, options)
+      end
     end
 
     # Options are :line_character, :space_character, :w_character,
@@ -151,7 +208,7 @@ module Barcode1DTools
 
     # returns a run-length-encoded string representation
     def rle
-      @rle ||= self.wn.tr('nw','1'+WN_RATIO.to_s)
+      @rle ||= self.class.wn_to_rle(self.wn, @options)
     end
 
     # returns 1s and 0s (for "black" and "white")
