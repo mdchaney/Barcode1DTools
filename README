@@ -1,12 +1,10 @@
 UNDER DEVELOPMENT
 
 This is an implementation of 1D barcodes in Ruby.  Code currently works
-to generate Interleaved 2 of 5 (I 2/5) EAN-13, and UPC-A symbologies.
-The complete library is under development, but this code works fine.  I
-will add more codes and unit tests for each as time permits.
-
-This code also includes the ability to decode bar patterns for EAN-13
-and UPC-A codes.
+to generate and decode Interleaved 2 of 5 (I 2/5) EAN-13, and UPC-A
+symbologies.  The complete library is under development, but this code
+works fine.  I will add more codes and unit tests for each as time
+permits.
 
 There is currently a fairly complete Perl implementation at:
 

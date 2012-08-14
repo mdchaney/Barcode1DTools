@@ -26,7 +26,8 @@ module Barcode1DTools
   # The object created is immutable.
   #
   # Barcode1DTools::Interleaved2of5 creates the patterns that you need to
-  # display Interleaved 2 of 5 (also known as I 2/5) barcodes.
+  # display Interleaved 2 of 5 (also known as I 2/5) barcodes.  It can also
+  # decode a simple w/n string.
   #
   # I 2/5 barcodes consist of lines and spaces that are either "wide" or
   # "narrow", with "wide" lines or spaces being twice the width of
