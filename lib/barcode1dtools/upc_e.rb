@@ -87,7 +87,7 @@ module Barcode1DTools
     attr_reader :upca_value
 
     class << self
-      # Returns true or false - must be 11-13 digits.  This
+      # Returns true or false - must be 6-8 digits.  This
       # also handles the case where the leading 0 is added.
       def can_encode?(value, options = nil)
         if !options
