@@ -9,7 +9,7 @@ module Barcode1DTools
   #
   # Barcode1DTools is a library for generating and decoding
   # 1-dimensional barcode patterns for various code types.
-  # The library currently includes EAN-13, UPC-A, and
+  # The library currently includes EAN-13, UPC-A, UPC-E, and
   # Interleaved 2 of 5 (I 2/5), but will be expanded to
   # include most 1D symbologies in the near future.
   #
