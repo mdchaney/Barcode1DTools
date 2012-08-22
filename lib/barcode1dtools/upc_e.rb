@@ -180,7 +180,9 @@ module Barcode1DTools
         elsif value =~ /(\d\d\d\d)(\d)(4)/
           upca_value = "0#{$1}00000#{$2}"
         elsif value =~ /(\d\d\d\d\d)([5-9])/
-          upca_value = "0#{$1}00000#{$2}"
+          upca_value = "0#{$1}0000#{$2}"
+        else
+          raise UnencodableCharactersError, "Cannot change UPC-E #{value} to UPC-A"
         end
         upca_value
       end
@@ -189,14 +191,16 @@ module Barcode1DTools
         raise UnencodableCharactersError unless UPC_A.can_encode?(value, options)
         value = value % 10 if options[:checksum_included]
         value = sprintf('%011d', value.to_i)
-        if value =~ /^0(\d\d)([012])0000(\d\d\d)/
-          upce_value = "0#{$1}#{$3}#{$2}"
-        elsif value =~ /^0(\d\d\d)00000(\d\d)/
-          upce_value = "0#{$1}#{$2}3"
-        elsif value =~ /^0(\d\d\d\d)00000(\d)/
-          upce_value = "0#{$1}#{$2}4"
-        elsif value =~ /^0(\d\d\d\d\d)00000([5-9])/
+        if value =~ /^0(\d\d\d\d[1-9])0000([5-9])/
           upce_value = "0#{$1}#{$2}"
+        elsif value =~ /^0(\d\d\d[1-9])00000(\d)/
+          upce_value = "0#{$1}#{$2}4"
+        elsif value =~ /^0(\d\d)([012])0000(\d\d\d)/
+          upce_value = "0#{$1}#{$3}#{$2}"
+        elsif value =~ /^0(\d\d[3-9])00000(\d\d)/
+          upce_value = "0#{$1}#{$2}3"
+        else
+          raise UnencodableCharactersError, "Cannot change UPC-A #{value} to UPC-E"
         end
         upce_value
       end
