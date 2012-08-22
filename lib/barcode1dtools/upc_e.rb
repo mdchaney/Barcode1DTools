@@ -120,7 +120,7 @@ module Barcode1DTools
         elsif str.length == 33 && str =~ /^[1-9]+$/
           # rle
         else
-          raise UnencodableCharactersError, "Pattern must be 95 unit bar pattern or 39 character rle."
+          raise UnencodableCharactersError, "Pattern must be 51 unit bar pattern or 33 character rle."
         end
 
         # See if the string is reversed
