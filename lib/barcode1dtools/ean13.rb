@@ -243,7 +243,7 @@ module Barcode1DTools
         elsif str.length == 59
           # rle
         else
-          raise UnencodableCharactersError, "Pattern must be 95 unit bar pattern or 39 character rle."
+          raise UnencodableCharactersError, "Pattern must be 95 unit bar pattern or 59 character rle."
         end
 
         # Check the guard patterns
