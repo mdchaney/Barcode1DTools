@@ -197,7 +197,7 @@ module Barcode1DTools
         # need to add a checksum
         @value = value.to_s
         @check_digit = self.class.generate_check_digit_for(@value)
-        @encoded_string = sprintf('%05d%1d',@value,@check_digit)
+        @encoded_string = sprintf('%05d%1d',@value.to_i,@check_digit)
       end
 
       md = @value.match(/^(\d)(\d{4})/)
