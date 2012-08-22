@@ -222,7 +222,7 @@ module Barcode1DTools
         raise UnencodableCharactersError unless self.can_encode?(value, :checksum_included => false)
         mult = 3
         value = value.split('').inject(0) { |a,c| mult = 4 - mult ; a + c.to_i * mult }
-        10 - (value % 10)
+        (10 - (value % 10)) % 10
       end
 
       # validates the check digit given a string - assumes check digit

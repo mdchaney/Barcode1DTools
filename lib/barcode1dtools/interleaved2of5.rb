@@ -105,7 +105,7 @@ module Barcode1DTools
         value = value.to_s
         value = "0#{value}" if value.size.even?
         value = value.split('').inject(0) { |a,c| mult = 4 - mult ; a + c.to_i * mult }
-        10 - (value % 10)
+        (10 - (value % 10)) % 10
       end
 
       # validates the check digit given a string - assumes check digit
