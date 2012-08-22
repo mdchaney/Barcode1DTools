@@ -1,3 +1,12 @@
+#--
+# Copyright 2012 Michael Chaney Consulting Corporation
+#
+# Released under the terms of the MIT License or the GNU
+# General Public License, v. 2
+#++
+
+require 'barcode1dtools/ean13'
+
 module Barcode1DTools
 
   # Barcode1DTools::UPC_A - Create pattern for UPC-A barcodes
