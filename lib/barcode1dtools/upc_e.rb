@@ -2,7 +2,7 @@ require 'barcode1dtools/upc_a'
 
 module Barcode1DTools
 
-  # Barcode1DTools::UPC_E - Create pattern for UPC-A barcodes
+  # Barcode1DTools::UPC_E - Create pattern for UPC-E barcodes
   #
   # The value encoded is an 6-digit integer, and a checksum digit
   # will be added.  You can add the option :checksum_included => true
