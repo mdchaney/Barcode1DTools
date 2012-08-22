@@ -19,7 +19,8 @@ module Barcode1DTools
   #
   # This type of barcode consists of 2 digits, and a check digit
   # (simply a modulus 4 of the number encoded) that is encoded in
-  # the "parity" of the two barcode digits.
+  # the "parity" of the two barcode digits.  The bar patterns are the
+  # same as the left half of a standard UPC-A.
   #
   # The 2-digit supplement is generally used on periodicals as an
   # "issue number", so that the UPC-A code may remain the same
@@ -67,7 +68,7 @@ module Barcode1DTools
     }
 
     class << self
-      # Returns true or false - must be 6-8 digits.  This
+      # Returns true or false - must be 1-3 digits.  This
       # also handles the case where the leading 0 is added.
       def can_encode?(value, options = nil)
         if !options
