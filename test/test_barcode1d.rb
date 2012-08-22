@@ -21,7 +21,7 @@ class Barcode1DToolsTest < Test::Unit::TestCase
 
   def test_back_and_forth
     random_rle = (0..19).collect { |x| (rand * 4 + 1).to_int.to_s }.join
-    random_bars = '1' + (0..99).collect { |x| (rand * 2).to_int.to_s }.join + '1'
+    random_bars = '1' + (0..((rand(25)+5)*2)).collect { |x| (x.odd? ? '1' : '0')*(rand(5)+1) }.join + '1'
     random_wn = (0..19).collect { |x| rand < 0.5 ? 'w' : 'n' }.join
     assert_equal random_rle, Barcode1DTools::Barcode1D.bars_to_rle(Barcode1DTools::Barcode1D.rle_to_bars(random_rle, @options), @options)
     assert_equal random_bars, Barcode1DTools::Barcode1D.rle_to_bars(Barcode1DTools::Barcode1D.bars_to_rle(random_bars, @options), @options)
