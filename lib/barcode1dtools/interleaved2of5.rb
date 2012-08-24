@@ -146,8 +146,7 @@ module Barcode1DTools
 
         decoded_string = ''
 
-        numeric_pattern.scan(/(.{10})/).each do |chunk|
-          chunk = chunk[0]
+        numeric_pattern.scan(/.{10}/).each do |chunk|
 
           num1 = chunk[0,1] + chunk[2,1] + chunk[4,1] + chunk[6,1] + chunk[8,1]
           num2 = chunk[1,1] + chunk[3,1] + chunk[5,1] + chunk[7,1] + chunk[9,1]
