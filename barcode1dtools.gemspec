@@ -7,14 +7,13 @@ Gem::Specification.new do |s|
   s.summary     = "Pattern generators for 1D barcodes"
   s.description = <<-EOF
     Barcode1D is a small library for handling many kinds of
-    1-dimensional barcodes.  Currently implemented are
-    Interleaved 2 of 5, EAN-13, EAN-8, UPC-A, UPC-E, UPC
-    Supplemental 2, and UPC Supplemental 5.  Patterns are
-    created in either a simple format of bars and spaces or
-    as a run-length encoded string.  This only generates
-    and decodes the patterns; actual display or reading
-    from a device must be implemented by the programmer.
-	 More symbologies will be added as time permits.
+    1-dimensional barcodes.  Currently implemented are Code 3 of 9,
+    Interleaved 2 of 5, EAN-13, EAN-8, UPC-A, UPC-E, UPC Supplemental 2,
+    and UPC Supplemental 5.  Patterns are created in either a simple
+    format of bars and spaces or as a run-length encoded string.  This
+    only generates and decodes the patterns; actual display or reading
+    from a device must be implemented by the programmer.  More
+    symbologies will be added as time permits.
   EOF
   s.author      = "Michael Chaney"
   s.email       = 'mdchaney@michaelchaney.com'
