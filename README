@@ -17,7 +17,9 @@ There is currently a fairly complete Perl implementation at:
 
 https://github.com/mdchaney/barcodes
 
-I believe those work fine, but consider it legacy code.
+I believe those work fine, but consider it legacy code.  If you would
+like to help in porting over any of the symbologies there please let me
+know.  I would love to receive patches :)
 
 Copyright 2012 Michael Chaney Consulting Corporation, All Rights Reserved
 
