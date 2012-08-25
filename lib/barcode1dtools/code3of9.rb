@@ -72,6 +72,13 @@ module Barcode1DTools
   # only for shifting.  However, if you need to use a full character
   # set, Code 128 is probably a better choice.
   #
+  # Note:
+  # Please note that Code 3 of 9 is not suggested for new applications
+  # due to the fact that the code is sparse and doesn't encode a full
+  # range of characters without using the "full ascii extensions",
+  # which cause it to be even more sparse.  For newer 1D applications
+  # use Code 128.
+  #
   #== Rendering
   #
   # Code 3 of 9 may be rendered however the programmer wishes.  Since
