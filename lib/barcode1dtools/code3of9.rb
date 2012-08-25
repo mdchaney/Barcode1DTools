@@ -140,6 +140,156 @@ module Barcode1DTools
 
     SIDE_GUARD_PATTERN = 'nwnnwnwnn'
 
+    FULL_ASCII_LOOKUP = [
+      '%U', '$A', '$B', '$C', '$D', '$E', '$F', '$G', '$H', '$I',
+      '$J', '$K', '$L', '$M', '$N', '$O', '$P', '$Q', '$R', '$S',
+      '$T', '$U', '$V', '$W', '$X', '$Y', '$Z', '%A', '%B', '%C',
+      '%D', '%E', ' ', '/A', '/B', '/C', '/D', '/E', '/F', '/G',
+      '/H', '/I', '/J', '/K', '/L', '-', '.', '/O', '0', '1', '2',
+      '3', '4', '5', '6', '7', '8', '9', '/Z', '%F', '%G', '%H',
+      '%I', '%J', '%V', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
+      'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+      'U', 'V', 'W', 'X', 'Y', 'Z', '%K', '%L', '%M', '%N', '%O',
+      '%W', '+A', '+B', '+C', '+D', '+E', '+F', '+G', '+H', '+I',
+      '+J', '+K', '+L', '+M', '+N', '+O', '+P', '+Q', '+R', '+S',
+      '+T', '+U', '+V', '+W', '+X', '+Y', '+Z', '%P', '%Q', '%R',
+      '%S', '%T'
+    ]
+
+    FULL_ASCII_REVERSE_LOOKUP = {
+      '%U' => { 'position' => 0,  'name' => '<NUL>' },
+      '$A' => { 'position' => 1,  'name' => '<SOH>' },
+      '$B' => { 'position' => 2,  'name' => '<STX>' },
+      '$C' => { 'position' => 3,  'name' => '<ETX>' },
+      '$D' => { 'position' => 4,  'name' => '<EOT>' },
+      '$E' => { 'position' => 5,  'name' => '<ENQ>' },
+      '$F' => { 'position' => 6,  'name' => '<ACK>' },
+      '$G' => { 'position' => 7,  'name' => '<BEL>' },
+      '$H' => { 'position' => 8,  'name' => '<BS>' },
+      '$I' => { 'position' => 9,  'name' => '<HT>' },
+      '$J' => { 'position' => 10, 'name' => '<LF>' },
+      '$K' => { 'position' => 11, 'name' => '<VT>' },
+      '$L' => { 'position' => 12, 'name' => '<FF>' },
+      '$M' => { 'position' => 13, 'name' => '<CR>' },
+      '$N' => { 'position' => 14, 'name' => '<SO>' },
+      '$O' => { 'position' => 15, 'name' => '<SI>' },
+      '$P' => { 'position' => 16, 'name' => '<DLE>' },
+      '$Q' => { 'position' => 17, 'name' => '<DC1>' },
+      '$R' => { 'position' => 18, 'name' => '<DC2>' },
+      '$S' => { 'position' => 19, 'name' => '<DC3>' },
+      '$T' => { 'position' => 20, 'name' => '<DC4>' },
+      '$U' => { 'position' => 21, 'name' => '<NAK>' },
+      '$V' => { 'position' => 22, 'name' => '<SYN>' },
+      '$W' => { 'position' => 23, 'name' => '<ETB>' },
+      '$X' => { 'position' => 24, 'name' => '<CAN>' },
+      '$Y' => { 'position' => 25, 'name' => '<EM>' },
+      '$Z' => { 'position' => 26, 'name' => '<SUB>' },
+      '%A' => { 'position' => 27, 'name' => '<ESC>' },
+      '%B' => { 'position' => 28, 'name' => '<FS>' },
+      '%C' => { 'position' => 29, 'name' => '<GS>' },
+      '%D' => { 'position' => 30, 'name' => '<RS>' },
+      '%E' => { 'position' => 31, 'name' => '<US>' },
+      ' '  => { 'position' => 32, 'name' => ' ' },
+      '/A' => { 'position' => 33, 'name' => '!' },
+      '/B' => { 'position' => 34, 'name' => '"' },
+      '/C' => { 'position' => 35, 'name' => '#' },
+      '/D' => { 'position' => 36, 'name' => '$' },
+      '/E' => { 'position' => 37, 'name' => '%' },
+      '/F' => { 'position' => 38, 'name' => '&' },
+      '/G' => { 'position' => 39, 'name' => "'" },
+      '/H' => { 'position' => 40, 'name' => '(' },
+      '/I' => { 'position' => 41, 'name' => ')' },
+      '/J' => { 'position' => 42, 'name' => '*' },
+      '/K' => { 'position' => 43, 'name' => '+' },
+      '/L' => { 'position' => 44, 'name' => ',' },
+      '-'  => { 'position' => 45, 'name' => '-' },
+      '.'  => { 'position' => 46, 'name' => '.' },
+      '/O' => { 'position' => 47, 'name' => '/' },
+      '0'  => { 'position' => 48, 'name' => '0' },
+      '1'  => { 'position' => 49, 'name' => '1' },
+      '2'  => { 'position' => 50, 'name' => '2' },
+      '3'  => { 'position' => 51, 'name' => '3' },
+      '4'  => { 'position' => 52, 'name' => '4' },
+      '5'  => { 'position' => 53, 'name' => '5' },
+      '6'  => { 'position' => 54, 'name' => '6' },
+      '7'  => { 'position' => 55, 'name' => '7' },
+      '8'  => { 'position' => 56, 'name' => '8' },
+      '9'  => { 'position' => 57, 'name' => '9' },
+      '/Z' => { 'position' => 58, 'name' => ':' },
+      '%F' => { 'position' => 59, 'name' => ';' },
+      '%G' => { 'position' => 60, 'name' => '<' },
+      '%H' => { 'position' => 61, 'name' => '=' },
+      '%I' => { 'position' => 62, 'name' => '>' },
+      '%J' => { 'position' => 63, 'name' => '?' },
+      '%V' => { 'position' => 64, 'name' => '@' },
+      'A'  => { 'position' => 65, 'name' => 'A' },
+      'B'  => { 'position' => 66, 'name' => 'B' },
+      'C'  => { 'position' => 67, 'name' => 'C' },
+      'D'  => { 'position' => 68, 'name' => 'D' },
+      'E'  => { 'position' => 69, 'name' => 'E' },
+      'F'  => { 'position' => 70, 'name' => 'F' },
+      'G'  => { 'position' => 71, 'name' => 'G' },
+      'H'  => { 'position' => 72, 'name' => 'H' },
+      'I'  => { 'position' => 73, 'name' => 'I' },
+      'J'  => { 'position' => 74, 'name' => 'J' },
+      'K'  => { 'position' => 75, 'name' => 'K' },
+      'L'  => { 'position' => 76, 'name' => 'L' },
+      'M'  => { 'position' => 77, 'name' => 'M' },
+      'N'  => { 'position' => 78, 'name' => 'N' },
+      'O'  => { 'position' => 79, 'name' => 'O' },
+      'P'  => { 'position' => 80, 'name' => 'P' },
+      'Q'  => { 'position' => 81, 'name' => 'Q' },
+      'R'  => { 'position' => 82, 'name' => 'R' },
+      'S'  => { 'position' => 83, 'name' => 'S' },
+      'T'  => { 'position' => 84, 'name' => 'T' },
+      'U'  => { 'position' => 85, 'name' => 'U' },
+      'V'  => { 'position' => 86, 'name' => 'V' },
+      'W'  => { 'position' => 87, 'name' => 'W' },
+      'X'  => { 'position' => 88, 'name' => 'X' },
+      'Y'  => { 'position' => 89, 'name' => 'Y' },
+      'Z'  => { 'position' => 90, 'name' => 'Z' },
+      '%K' => { 'position' => 91, 'name' => '[' },
+      '%L' => { 'position' => 92, 'name' => '\\' },
+      '%M' => { 'position' => 93, 'name' => ']' },
+      '%N' => { 'position' => 94, 'name' => '^' },
+      '%O' => { 'position' => 95, 'name' => '_' },
+      '%W' => { 'position' => 96, 'name' => '`' },
+      '+A' => { 'position' => 97, 'name' => 'a' },
+      '+B' => { 'position' => 98, 'name' => 'b' },
+      '+C' => { 'position' => 99, 'name' => 'c' },
+      '+D' => { 'position' => 100, 'name' => 'd' },
+      '+E' => { 'position' => 101, 'name' => 'e' },
+      '+F' => { 'position' => 102, 'name' => 'f' },
+      '+G' => { 'position' => 103, 'name' => 'g' },
+      '+H' => { 'position' => 104, 'name' => 'h' },
+      '+I' => { 'position' => 105, 'name' => 'i' },
+      '+J' => { 'position' => 106, 'name' => 'j' },
+      '+K' => { 'position' => 107, 'name' => 'k' },
+      '+L' => { 'position' => 108, 'name' => 'l' },
+      '+M' => { 'position' => 109, 'name' => 'm' },
+      '+N' => { 'position' => 110, 'name' => 'n' },
+      '+O' => { 'position' => 111, 'name' => 'o' },
+      '+P' => { 'position' => 112, 'name' => 'p' },
+      '+Q' => { 'position' => 113, 'name' => 'q' },
+      '+R' => { 'position' => 114, 'name' => 'r' },
+      '+S' => { 'position' => 115, 'name' => 's' },
+      '+T' => { 'position' => 116, 'name' => 't' },
+      '+U' => { 'position' => 117, 'name' => 'u' },
+      '+V' => { 'position' => 118, 'name' => 'v' },
+      '+W' => { 'position' => 119, 'name' => 'w' },
+      '+X' => { 'position' => 120, 'name' => 'x' },
+      '+Y' => { 'position' => 121, 'name' => 'y' },
+      '+Z' => { 'position' => 122, 'name' => 'z' },
+      '%P' => { 'position' => 123, 'name' => '{' },
+      '%Q' => { 'position' => 124, 'name' => '|' },
+      '%R' => { 'position' => 125, 'name' => '}' },
+      '%S' => { 'position' => 126, 'name' => '~' },
+      '%T' => { 'position' => 127, 'name' => '<DEL>' },
+      '%X' => { 'position' => 127, 'name' => '<DEL>' },
+      '%Y' => { 'position' => 127, 'name' => '<DEL>' },
+      '%Z' => { 'position' => 127, 'name' => '<DEL>' }
+    }
+
     WN_RATIO = 2
 
     DEFAULT_OPTIONS = {
@@ -218,6 +368,26 @@ module Barcode1DTools
         end
 
         Code3of9.new(decoded_string, options)
+      end
+
+      # Provide encoding into the "full ascii" format.  This
+      # allows us to encode any ascii character (0-127) in a Code 3
+      # of 9, but it is up to the application to anticipate and
+      # handle this.  In this encoding, four of the characters
+      # ($, %, /, and +) are used as "shift" characters, paired
+      # with a letter A-Z that encodes a character that's not
+      # available in Code 3 of 9.  Because no special characters
+      # are used, it's not possible to know if this encoding is
+      # used.
+      def encode_full_ascii(str)
+        str.split('').collect { |c| FULL_ASCII_LOOKUP[c[0]] }.join
+      end
+
+      # Decodes a "full ascii" string from Code 3 of 9 into standard
+      # ascii.  Note that this will silently fail if a string is
+      # malformed.
+      def decode_full_ascii(str)
+        str.scan(/[\$%\/+]?[A-Z0-9 \.\-]/).collect { |c| FULL_ASCII_REVERSE_LOOKUP[c]['position'] }.pack('C*')
       end
     end
 

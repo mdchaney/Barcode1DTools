@@ -21,6 +21,28 @@ class Barcode1DToolsCode3of9Test < Test::Unit::TestCase
     (0..x-1).inject('') { |a,c| a + Barcode1DTools::Code3of9::CHAR_SEQUENCE[rand(num_chars),1] }
   end
 
+  def random_x_character_full_ascii_string(x)
+    (1..x).collect { rand(128) }.pack('C*')
+  end
+
+  def all_ascii_random_order
+    arr = (0..127).to_a
+    ret = []
+    while arr.size > 0
+      ret.push(arr.delete_at(rand(arr.size)))
+    end
+    ret.pack("C*")
+  end
+
+  def test_full_ascii
+    random_string = random_x_character_full_ascii_string(rand(20) + 10)
+    encoded1 = Barcode1DTools::Code3of9.encode_full_ascii(random_string)
+    assert_equal random_string, Barcode1DTools::Code3of9.decode_full_ascii(encoded1)
+    assert_equal "T+H+I+S +I+S +A +T+E+S+T/A", Barcode1DTools::Code3of9.encode_full_ascii("This is a test!")
+    big_random_string = all_ascii_random_order
+    assert_equal big_random_string, Barcode1DTools::Code3of9.decode_full_ascii(Barcode1DTools::Code3of9.encode_full_ascii(big_random_string))
+  end
+
   def test_checksum_generation
     assert_equal 'I', Barcode1DTools::Code3of9.generate_check_digit_for('THIS IS A TEST')
   end
