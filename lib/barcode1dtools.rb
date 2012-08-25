@@ -13,12 +13,11 @@ module Barcode1DTools
   #= barcode1dtools.rb
   #
   # Barcode1DTools is a library for generating and decoding
-  # 1-dimensional barcode patterns for various code types.
-  # The library currently includes EAN-13, EAN-8, UPC-A,
-  # UPC-E, UPC Supplemental 2, UPC Supplemental 5,
-  # Interleaved 2 of 5 (I 2/5), and Code 3 of 9, but will be
-  # expanded to include most 1D symbologies in the near
-  # future.
+  # 1-dimensional barcode patterns for various code types.  The
+  # library currently includes EAN-13, EAN-8, UPC-A, UPC-E, UPC
+  # Supplemental 2, UPC Supplemental 5, Interleaved 2 of 5 (I 2/5),
+  # Code 3 of 9, and Code 93, but will be expanded to include most 1D
+  # symbologies in the near future.
   #
   #== Example
   #  ean13 = Barcode1DTools::EAN13.new('0012676510226', :line_character => 'x', :space_character => ' ')
@@ -119,3 +118,4 @@ require 'barcode1dtools/upc_e'
 require 'barcode1dtools/upc_supplemental_2'
 require 'barcode1dtools/upc_supplemental_5'
 require 'barcode1dtools/code3of9'
+require 'barcode1dtools/code93'
