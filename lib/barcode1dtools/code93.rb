@@ -389,7 +389,6 @@ module Barcode1DTools
         payload, checksum = md[1], md[2]
 
         decoded_string = decode_full_ascii(payload)
-        STDERR.puts decoded_string
 
         Code93.new(decoded_string, options.merge(:checksum_included => false))
       end
