@@ -99,4 +99,13 @@ class Barcode1DToolsUPC_ATest < Test::Unit::TestCase
     ean4 = Barcode1DTools::UPC_A.decode(ean.bars.reverse)
     assert_equal ean.value, ean4.value
   end
+
+  def test_upc_e_conversion
+    upc_e = Barcode1DTools::UPC_E.new('0384754')
+    upc_a = upc_e.to_upc_a
+    assert_equal upc_e.value, upc_a.to_upc_e.value
+    assert upc_a.upc_e_encodable?
+    upc_a_2 = Barcode1DTools::UPC_A.new('012676510226', :checksum_included => true)
+    assert !upc_a_2.upc_e_encodable?
+  end
 end

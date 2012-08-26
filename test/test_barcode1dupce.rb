@@ -124,4 +124,10 @@ class Barcode1DToolsUPC_ETest < Test::Unit::TestCase
     upce4 = Barcode1DTools::UPC_E.decode(upce.bars.reverse)
     assert_equal upce.value, upce4.value
   end
+
+  def test_upc_a_conversion
+    upc_e = Barcode1DTools::UPC_E.new('0384754')
+    upc_a = upc_e.to_upc_a
+    assert_equal upc_e.value, upc_a.to_upc_e.value
+  end
 end

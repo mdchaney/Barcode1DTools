@@ -264,6 +264,11 @@ module Barcode1DTools
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end
 
+    # Returns a UPC_A object with the same value
+    def to_upc_a
+      UPC_A.new(self.class.upce_value_to_upca_value(@value), options.merge(:checksum_included => false))
+    end
+
     private
 
     def gen_rle(payload, parity_digit)

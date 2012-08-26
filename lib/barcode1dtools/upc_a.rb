@@ -139,5 +139,20 @@ module Barcode1DTools
       end
     end
 
+    # Returns a UPC_E object with the same value
+    def to_upc_e
+      UPC_E.new(UPC_E.upca_value_to_upce_value(@value), options.merge(:checksum_included => false))
+    end
+
+    # Returns true if the current value may be encoded as UPC-E
+    def upc_e_encodable?
+      begin
+        UPC_E.new(UPC_E.upca_value_to_upce_value(@value), options.merge(:checksum_included => false))
+        return true
+      rescue UnencodableCharactersError
+        return false
+      end
+    end
+
   end
 end
