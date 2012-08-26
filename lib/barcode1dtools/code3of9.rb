@@ -387,7 +387,7 @@ module Barcode1DTools
       # are used, it's not possible to know if this encoding is
       # used.
       def encode_full_ascii(str)
-        str.split('').collect { |c| FULL_ASCII_LOOKUP[c[0]] }.join
+        str.bytes.collect { |c| FULL_ASCII_LOOKUP[c] }.join
       end
 
       # Decodes a "full ascii" string from Code 3 of 9 into standard
