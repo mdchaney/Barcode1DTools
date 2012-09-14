@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'barcode1dtools'
-  s.version     = '0.9.4.1'
+  s.version     = '0.9.5.0'
   s.licenses    = ['MIT', 'GPL-2']
   s.platform    = Gem::Platform::RUBY
   s.date        = '2012-08-05'
@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = <<-EOF
 	 Barcode1D is a small library for handling many kinds of
 	 1-dimensional barcodes.  Currently implemented are Code 3 of 9, Code
-	 93, Interleaved 2 of 5, EAN-13, EAN-8, UPC-A, UPC-E, UPC
+	 93, Codabar, Interleaved 2 of 5, EAN-13, EAN-8, UPC-A, UPC-E, UPC
 	 Supplemental 2, and UPC Supplemental 5.  Patterns are created in
 	 either a simple format of bars and spaces or as a run-length encoded
 	 string.  This only generates and decodes the patterns; actual
