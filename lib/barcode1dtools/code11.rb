@@ -53,8 +53,7 @@ module Barcode1DTools
   #          is twice the width of a "narrow" item.
   #
   # The "width" method will tell you the total end-to-end width, in
-  # units, of the entire barcode.  Note that the w/n format is
-  # unavailable for this symbology.
+  # units, of the entire barcode.
   #
   #== Rendering
   #
