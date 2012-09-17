@@ -8,11 +8,11 @@
 UNDER DEVELOPMENT
 
 This is an implementation of 1D barcodes in Ruby.  Code currently works
-to generate and decode Code 3 of 9, Code 93, Codabar, Interleaved 2 of 5
-(I 2/5) EAN-13, EAN-8, UPC-A, UPC-E, UPC Supplemental 2, and UPC
-Supplemental 5 symbologies.  The complete library is under development,
-but this code works fine.  I will add more symbologies and unit tests
-for each as time permits.
+to generate and decode Code 3 of 9, Code 93, Code 11, Codabar,
+Interleaved 2 of 5 (I 2/5) EAN-13, EAN-8, UPC-A, UPC-E, UPC Supplemental
+2, and UPC Supplemental 5 symbologies.  The complete library is under
+development, but this code works fine.  I will add more symbologies and
+unit tests for each as time permits.
 
 There is currently a fairly complete Perl implementation at:
 
