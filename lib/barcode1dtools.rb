@@ -17,8 +17,9 @@ module Barcode1DTools
   # library currently includes EAN-13, EAN-8, UPC-A, UPC-E, UPC
   # Supplemental 2, UPC Supplemental 5, Interleaved 2 of 5 (I 2/5),
   # COOP 2 of 5, Matrix 2 of 5, Industrial 2 of 5, IATA 2 of 5,
-  # PostNet, Code 3 of 9, Code 93, Code 11, and Codabar, but will
-  # be expanded to include most 1D symbologies in the near future.
+  # PostNet, Plessey, MSI (Modified Plessey), Code 3 of 9, Code 93,
+  # Code 11, and Codabar, but will be expanded to include most 1D
+  # symbologies in the near future.
   #
   #== Example
   #  ean13 = Barcode1DTools::EAN13.new('0012676510226', :line_character => 'x', :space_character => ' ')
@@ -127,3 +128,5 @@ require 'barcode1dtools/industrial2of5'
 require 'barcode1dtools/iata2of5'
 require 'barcode1dtools/matrix2of5'
 require 'barcode1dtools/postnet'
+require 'barcode1dtools/plessey'
+require 'barcode1dtools/msi'
