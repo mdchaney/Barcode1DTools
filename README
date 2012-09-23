@@ -8,20 +8,23 @@
 UNDER DEVELOPMENT
 
 This is an implementation of 1D barcodes in Ruby.  Code currently works
-to generate and decode Code 3 of 9, Code 93, Code 11, Codabar,
+to generate and decode Code 128, Code 3 of 9, Code 93, Code 11, Codabar,
 Interleaved 2 of 5 (I 2/5), COOP 2 of 5, Matrix 2 of 5, Industrial 2 of
 5, IATA 2 of 5, PostNet, Plessey, MSI (Modified Plessey), EAN-13, EAN-8,
 UPC-A, UPC-E, UPC Supplemental 2, and UPC Supplemental 5 symbologies.
-The complete library is under development, but this code works fine.  I
-will add more symbologies and unit tests for each as time permits.
 
-There is currently a fairly complete Perl implementation at:
+This is a pretty complete set of 1D symbologies and most or all other
+common symbologies are based on one of the above.  As of the 2000s most
+bar code advancement is taking place in the 2D realm so it's unlikely
+that anything more will come about.  Additionally, Code 128 is general
+purpose and sufficiently compact and robust enough to cover any
+application.
+
+I also have a fairly complete Perl implementation at:
 
 https://github.com/mdchaney/barcodes
 
-I believe those work fine, but consider it legacy code.  If you would
-like to help in porting over any of the symbologies there please let me
-know.  I would love to receive patches :)
+I believe those work fine, but consider it legacy code.
 
 Copyright 2012 Michael Chaney Consulting Corporation, All Rights Reserved
 
