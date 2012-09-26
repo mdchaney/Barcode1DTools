@@ -22,7 +22,7 @@ module Barcode1DTools
   #
   # Additionally, the caller must present the start and stop
   # characters as part of the value.  When decoding, the start/stop
-  # cahracters will be presented as A, B, C, or D.  
+  # characters will be presented as A, B, C, or D.  
   #
   # val = "A29322930C"
   # bc = Barcode1DTools::Codabar.new(val)
