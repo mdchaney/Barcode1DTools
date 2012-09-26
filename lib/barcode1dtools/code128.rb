@@ -255,7 +255,7 @@ module Barcode1DTools
         end
         # Make sure it's Latin-1 for Ruby 1.9+
         if RUBY_VERSION >= "1.9"
-          ret = ret.collect { |c| c.force_encoding('ISO-8859-1') }
+          ret = ret.collect { |c| c.is_a?(Symbol) ? c : c.force_encoding('ISO-8859-1') }
         end
         if options[:raw_array]
           ret.push(md[2].unpack('C').first)
