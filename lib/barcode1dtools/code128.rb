@@ -270,7 +270,7 @@ module Barcode1DTools
       # optimization should cover 99% of cases very well,
       # although I'm sure an edge case could be created that
       # would be suboptimal.
-      def latin1_to_code128(str)
+      def latin1_to_code128(str, options = {})
         if str.is_a?(String)
           str = [str]
         elsif !str.is_a?(Array)
@@ -493,7 +493,7 @@ module Barcode1DTools
     private
 
     def gen_rle(encoded_string, options)
-      @rle_str ||= @encoded_string.split('').collect { |c| PATTERNS[c] }.join
+      @rle_str ||= @encoded_string.split('').collect { |c| PATTERNS[c.unpack('C').first] }.join
     end
 
   end
