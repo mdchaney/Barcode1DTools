@@ -161,9 +161,9 @@ plessey = Barcode1DTools::Plessey.new('1234567890')
 pdf.add_text_wrap(100, 762, 100, "Plessey", 10, :left, 0)
 render_barcode(pdf, plessey, 100, 700, 150, 60)
 
-msi = Barcode1DTools::MSI.new('1234567890')
+msi = Barcode1DTools::MSI.new('1234567')
 pdf.add_text_wrap(300, 762, 100, "MSI", 10, :left, 0)
-render_barcode(pdf, msi, 300, 700, 150, 60)
+render_barcode(pdf, msi, 300, 700, 120, 60)
 
 # row 8
 postnet = Barcode1DTools::PostNet.new('370134460')
