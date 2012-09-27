@@ -5,7 +5,7 @@
 # General Public License, v. 2
 #++
 
-UNDER DEVELOPMENT
+RELEASE VERSION
 
 This is an implementation of 1D barcodes in Ruby.  Code currently works
 to generate and decode Code 128, Code 3 of 9, Code 93, Code 11, Codabar,
