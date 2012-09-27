@@ -455,9 +455,9 @@ module Barcode1DTools
 
       @options = DEFAULT_OPTIONS.merge(options)
 
-      if options[:raw_value]
+      if @options[:raw_value]
         @encoded_string = value
-        @value = self.class.code128_to_latin1(value, options)
+        @value = self.class.code128_to_latin1(value, @options)
       else
         if value.is_a?(Array)
           @value = value
@@ -481,7 +481,7 @@ module Barcode1DTools
           end
         end
         raise UnencodableCharactersError unless self.class.can_encode?(value)
-        @encoded_string = self.class.latin1_to_code128(@value, options)
+        @encoded_string = self.class.latin1_to_code128(@value, @options)
       end
 
       md = self.class.parse_code128(@encoded_string)

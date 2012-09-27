@@ -430,7 +430,7 @@ module Barcode1DTools
         @value, @check_digit = md[1], md[2]
       else
         @value = value
-        if options[:force_full_ascii] || self.class.requires_full_ascii?(value)
+        if @options[:force_full_ascii] || self.class.requires_full_ascii?(value)
           @full_ascii_value = self.class.encode_full_ascii(value)
           @full_ascii = true
           @check_digit = self.class.generate_check_digit_for(@full_ascii_value)

@@ -220,12 +220,12 @@ module Barcode1DTools
         @value = value.to_s
         @check_digit = nil
       elsif @options[:checksum_included]
-        raise ChecksumError unless self.class.validate_check_digit_for(value, options)
+        raise ChecksumError unless self.class.validate_check_digit_for(value, @options)
         @encoded_string = value.to_s
-        @value, @check_digit = self.class.split_payload_and_check_digits(value, options)
+        @value, @check_digit = self.class.split_payload_and_check_digits(value, @options)
       else
         @value = value.to_s
-        @check_digit = self.class.generate_check_digit_for(@value, options)
+        @check_digit = self.class.generate_check_digit_for(@value, @options)
         @encoded_string = "#{@value}#{@check_digit}"
       end
     end
