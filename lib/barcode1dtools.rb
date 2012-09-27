@@ -20,6 +20,9 @@ module Barcode1DTools
   # PostNet, Plessey, MSI (Modified Plessey), Code 3 of 9, Code 93,
   # Code 11, Code 128, and Codabar.
   #
+  # Contact Michael Chaney Consulting Corporation for commercial
+  # support for this code: sales@michaelchaney.com
+  #
   #== Example
   #  ean13 = Barcode1DTools::EAN13.new('0012676510226', :line_character => 'x', :space_character => ' ')
   #  => #<Barcode1DTools::EAN13:0x10030d670 @check_digit=10, @manufacturers_code="12676", @encoded_string="001267651022610", @number_system="00", @value="0012676510226", @product_code="51022", @options={:line_character=>"1", :space_character=>"0"}>
