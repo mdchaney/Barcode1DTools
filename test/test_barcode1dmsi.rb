@@ -17,7 +17,7 @@ class Barcode1DToolsMSITest < Test::Unit::TestCase
 
   # Creates a random number from 1 to 10 digits long
   def random_msi_value(len)
-    (1..1+rand(len)).collect { "0123456789"[rand(11),1] }.join
+    rand(10**len).to_s
   end
 
   def test_checksum_generation
