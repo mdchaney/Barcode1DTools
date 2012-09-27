@@ -115,7 +115,7 @@ module Barcode1DTools
     # underscore, then has nul to \x1f.  Finally, it has FNC 1-4.
     CODE_A_TO_ASCII = ((32..95).to_a + (0..31).to_a).collect { |c| [c].pack('C') } + [ :fnc_3, :fnc_2, :shift_b, :code_c, :code_b, :fnc_4, :fnc_1, :start_a, :start_b, :start_c, :stop ]
     ASCII_TO_CODE_A = (0..(CODE_A_TO_ASCII.length-1)).inject({}) { |a,c| a[CODE_A_TO_ASCII[c]] = c; a }
-    CODE_A_TO_HIGH_ASCII = CODE_A_TO_ASCII.collect { |a| a.is_a?(Symbol) ? a : [a.unpack("C").first+128].pack("C") }
+    CODE_A_TO_HIGH_ASCII = CODE_A_TO_ASCII.collect { |a| a.is_a?(Symbol) ? a : [a.unpack("C").first+128].pack("C") }.collect { |c| RUBY_VERSION < "1.9" || c.is_a?(Symbol) ? c : c.force_encoding('ISO-8859-1') }
     HIGH_ASCII_TO_CODE_A = (0..(CODE_A_TO_HIGH_ASCII.length-1)).inject({}) { |a,c| a[CODE_A_TO_HIGH_ASCII[c]] = c; a }
 
     # Code B encodes ASCII space (\x20, dec. 32) to DEL (\x7f,
@@ -124,7 +124,7 @@ module Barcode1DTools
     # different position than in set A.
     CODE_B_TO_ASCII = (32..127).collect { |c| [c].pack('C') } + [ :fnc_3, :fnc_2, :shift_a, :code_c, :fnc_4, :code_a, :fnc_1, :start_a, :start_b, :start_c, :stop ]
     ASCII_TO_CODE_B = (0..(CODE_B_TO_ASCII.length-1)).inject({}) { |a,c| a[CODE_B_TO_ASCII[c]] = c; a }
-    CODE_B_TO_HIGH_ASCII = CODE_B_TO_ASCII.collect { |a| a.is_a?(Symbol) ? a : [a.unpack("C").first+128].pack("C") }
+    CODE_B_TO_HIGH_ASCII = CODE_B_TO_ASCII.collect { |a| a.is_a?(Symbol) ? a : [a.unpack("C").first+128].pack("C") }.collect { |c| RUBY_VERSION < "1.9" || c.is_a?(Symbol) ? c : c.force_encoding('ISO-8859-1') }
     HIGH_ASCII_TO_CODE_B = (0..(CODE_B_TO_HIGH_ASCII.length-1)).inject({}) { |a,c| a[CODE_B_TO_HIGH_ASCII[c]] = c; a }
 
     # Code C encodes digit pairs 00 to 99 as well as FNC 1.
@@ -325,6 +325,9 @@ module Barcode1DTools
         while x < map_a.length - 1 do
           map_a_len = map_a.index('-',x).to_i - x
           map_b_len = map_b.index('-',x).to_i - x
+          if map_a_len==0 && map_b_len==0
+            raise "Ack!  Bad mapping: #{map_a} & #{map_b}"
+          end
           if map_a_len >= map_b_len
             codepoints += map_a[x,map_a_len]
             x += map_a_len
@@ -439,7 +442,7 @@ module Barcode1DTools
 
         end
 
-        decoded_string = code128_to_latin1(points.pack('C*'))
+        decoded_string = code128_to_latin1(points.pack('C*'), options)
 
         Code128.new(decoded_string, options)
       end
@@ -456,11 +459,26 @@ module Barcode1DTools
         @encoded_string = value
         @value = self.class.code128_to_latin1(value, options)
       else
-        @value = value.to_s
+        if value.is_a?(Array)
+          @value = value
+        else
+          @value = [value.to_s]
+        end
         # In ruby 1.9, change to Latin-1 if it's in another encoding.
         # Really, the caller needs to handle this.
-        if RUBY_VERSION >= "1.9" && !['US-ASCII','ISO-8859-1'].include?(value.encoding)
-          value = value.encode('ISO-8859-1')
+        if RUBY_VERSION >= "1.9"
+          @value = @value.collect do |item|
+            if item.is_a?(Symbol)
+              item
+            else
+              item = item.to_s
+              if ['US-ASCII','ISO-8859-1'].include?(item.encoding)
+                item
+              else
+                item.encode('ISO-8859-1')
+              end
+            end
+          end
         end
         raise UnencodableCharactersError unless self.class.can_encode?(value)
         @encoded_string = self.class.latin1_to_code128(@value, options)

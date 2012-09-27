@@ -21,10 +21,10 @@ class Barcode1DToolsCode128Test < Test::Unit::TestCase
 
   def random_x_character_latin1_string(x)
     str=(1..x).collect { rand(256) }.pack('C*')
-    if RUBY_VERSION >= "1.9"
-      str.force_encoding('ISO-8859-1')
-    else
+    if RUBY_VERSION < "1.9"
       str
+    else
+      str.force_encoding('ISO-8859-1')
     end
   end
 
@@ -54,7 +54,7 @@ class Barcode1DToolsCode128Test < Test::Unit::TestCase
 
   def test_attr_readers
     c128 = Barcode1DTools::Code128.new('Hello!')
-    assert_equal 'Hello!', c128.value
+    assert_equal ['Hello!'], c128.value
   end
 
   def test_decode_error
@@ -71,6 +71,16 @@ class Barcode1DToolsCode128Test < Test::Unit::TestCase
     assert_equal c128.value, c1282.value
     # Should also work in reverse
     c1284 = Barcode1DTools::Code128.decode(c128.rle.reverse)
+    assert_equal c128.value, c1284.value
+  end
+
+  def test_serious_decoding
+    random_c128_str = random_crazy_code128_value(rand(5) + 10)
+    c128 = Barcode1DTools::Code128.new(random_c128_str, :no_latin1 => true)
+    c1282 = Barcode1DTools::Code128.decode(c128.rle, :no_latin1 => true)
+    assert_equal c128.value, c1282.value
+    # Should also work in reverse
+    c1284 = Barcode1DTools::Code128.decode(c128.rle.reverse, :no_latin1 => true)
     assert_equal c128.value, c1284.value
   end
 end
