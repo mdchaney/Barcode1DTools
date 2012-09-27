@@ -116,11 +116,6 @@ module Barcode1DTools
         # intra-digit guard pattern, and "dddd" is the second
         # digit.
 
-        # See if the string is reversed
-        if str[10..12] == LEFT_GUARD_PATTERN_RLE.reverse && str[4..5] == MIDDLE_GUARD_PATTERN_RLE.reverse
-          str.reverse!
-        end
-
         # Check the guard patterns
         unless (str[0..2] == LEFT_GUARD_PATTERN_RLE && str[7..8] == MIDDLE_GUARD_PATTERN_RLE)
           raise UnencodableCharactersError, "Missing or incorrect guard patterns"

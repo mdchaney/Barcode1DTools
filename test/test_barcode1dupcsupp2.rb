@@ -82,8 +82,5 @@ class Barcode1DToolsUPC_Supp2Test < Test::Unit::TestCase
     assert_equal upcsupp2.value, upcsupp22.value
     upcsupp23 = Barcode1DTools::UPC_Supplemental_2.decode(upcsupp2.rle)
     assert_equal upcsupp2.value, upcsupp23.value
-    # Should also work in reverse
-    upcsupp24 = Barcode1DTools::UPC_Supplemental_2.decode(upcsupp2.bars.reverse)
-    assert_equal upcsupp2.value, upcsupp24.value
   end
 end
