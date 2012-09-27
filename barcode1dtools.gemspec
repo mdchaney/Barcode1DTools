@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
   s.name        = 'barcode1dtools'
-  s.version     = '0.9.9.4'
+  s.version     = '1.0.0.0'
   s.licenses    = ['MIT', 'GPL-2']
   s.platform    = Gem::Platform::RUBY
-  s.date        = '2012-09-22'
+  s.date        = '2012-09-27'
   s.summary     = "Pattern generators for 1D barcodes"
   s.description = <<-EOF
 	 Barcode1D is a small library for handling many kinds of

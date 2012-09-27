@@ -20,6 +20,14 @@ that anything more will come about.  Additionally, Code 128 is general
 purpose and sufficiently compact and robust enough to cover any
 application.
 
+I recommend any new application using 1D barcodes use Code 128.
+Strictly numeric data might also use Interleaved 2 of 5.  Of course, 2D
+barcodes are common now but 1D codes still have a huge installed base of
+readers and are generally easier to deal with.
+
+Contact Michael Chaney Consulting Corporation for commercial support for
+this code: sales@michaelchaney.com
+
 I also have a fairly complete Perl implementation at:
 
 https://github.com/mdchaney/barcodes
