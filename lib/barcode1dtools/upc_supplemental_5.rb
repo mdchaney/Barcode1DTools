@@ -139,11 +139,6 @@ module Barcode1DTools
         # intra-digit guard pattern, and "dddd" is the second
         # digit.  (ccdddd) occurs 4 times.
 
-        # See if the string is reversed
-        if str[28..30] == LEFT_GUARD_PATTERN_RLE.reverse && [7,13,19,25].all? { |x| str[29-x,2] == MIDDLE_GUARD_PATTERN_RLE.reverse }
-          str.reverse!
-        end
-
         # Check the guard patterns
         unless (str[0..2] == LEFT_GUARD_PATTERN_RLE && [7,13,19,25].all? { |x| str[x,2] == MIDDLE_GUARD_PATTERN_RLE.reverse })
           raise UnencodableCharactersError, "Missing or incorrect guard patterns"
