@@ -6,7 +6,7 @@ require 'barcode1dtools'
 
 # The quiet zone should be 10x the bar width.  This is a generic renderer
 # for barcodes.
-def render_barcode(pdf, barcode, x, y, width, height)
+def render_barcode(pdf, barcode, x, y, width, height, options = {})
   pdf.fill_color(Color::RGB::White)
   pdf.stroke_color(Color::RGB::Black)
   pdf.rectangle(x, y, width, height).fill
@@ -17,7 +17,11 @@ def render_barcode(pdf, barcode, x, y, width, height)
   width = width.to_f
   height = height.to_f
 
-  bar_width = width / (barcode.width.to_f + 20.0)
+  if options[:no_guard]
+    bar_width = width / barcode.width.to_f
+  else
+    bar_width = width / (barcode.width.to_f + 20.0)
+  end
 
   # leave 2 units at the top, 8 units at the bottom
   bar_height = height - 14.0
@@ -27,7 +31,7 @@ def render_barcode(pdf, barcode, x, y, width, height)
 
   # Now render the barcode
   count = 1
-  x_offset = x + bar_width * 10.0
+  x_offset = x + (options[:no_guard] ? 0 : bar_width * 10.0)
   barcode.rle.split('').each do |unit_width|
     box_width = unit_width.to_f * bar_width
     pdf.fill_color(count.odd? ? Color::RGB::Black : Color::RGB::White)
@@ -94,19 +98,19 @@ render_barcode(pdf, ean_8, 500, 100, 80, 60)
 # row 2
 upc_a = Barcode1DTools::UPC_A.new('636920922865', :checksum_included => true)
 pdf.add_text_wrap(100, 262, 100, "UPC-A", 10, :left, 0)
-render_barcode(pdf, upc_a, 100, 200, 100, 60)
+render_barcode(pdf, upc_a, 100, 200, 95, 60, :no_guard => true)
 
 upc_supp_2 = Barcode1DTools::UPC_Supplemental_2.new('23')
 pdf.add_text_wrap(195, 262, 100, "UPC-Supp-2", 10, :left, 0)
-render_barcode(pdf, upc_supp_2, 195, 200, 35, 50)
+render_barcode(pdf, upc_supp_2, 205, 200, 20, 50, :no_guard => true)
 
 upc_a = Barcode1DTools::EAN13.new('9781591844921', :checksum_included => true)
 pdf.add_text_wrap(300, 262, 100, "EAN-13", 10, :left, 0)
-render_barcode(pdf, upc_a, 300, 200, 100, 60)
+render_barcode(pdf, upc_a, 300, 200, 95, 60, :no_guard => true)
 
 upc_supp_5 = Barcode1DTools::UPC_Supplemental_5.new('52595')
 pdf.add_text_wrap(395, 262, 100, "UPC-Supp-5", 10, :left, 0)
-render_barcode(pdf, upc_supp_5, 395, 200, 35, 50)
+render_barcode(pdf, upc_supp_5, 405, 200, 47, 50, :no_guard => true)
 
 # row 3
 codabar = Barcode1DTools::Codabar.new('A29322930C')
@@ -124,11 +128,11 @@ render_barcode(pdf, code128, 400, 300, 100, 60)
 # row 4
 code3of9 = Barcode1DTools::Code3of9.new('THIS IS A TEST')
 pdf.add_text_wrap(100, 462, 100, "Code 3 of 9", 10, :left, 0)
-render_barcode(pdf, code3of9, 100, 400, 100, 60)
+render_barcode(pdf, code3of9, 100, 400, 150, 60)
 
 code93 = Barcode1DTools::Code93.new('This is a test!')
-pdf.add_text_wrap(250, 462, 100, "Code 93", 10, :left, 0)
-render_barcode(pdf, code93, 250, 400, 150, 60)
+pdf.add_text_wrap(300, 462, 100, "Code 93", 10, :left, 0)
+render_barcode(pdf, code93, 300, 400, 200, 60)
 
 # row 5
 coop2of5 = Barcode1DTools::Coop2of5.new('1234567')
@@ -137,11 +141,11 @@ render_barcode(pdf, coop2of5, 100, 500, 100, 60)
 
 iata2of5 = Barcode1DTools::IATA2of5.new('1234567')
 pdf.add_text_wrap(250, 562, 100, "IATA 2 of 5", 10, :left, 0)
-render_barcode(pdf, iata2of5, 250, 500, 100, 60)
+render_barcode(pdf, iata2of5, 250, 500, 120, 60)
 
 industrial2of5 = Barcode1DTools::Industrial2of5.new('1234567')
 pdf.add_text_wrap(400, 562, 100, "Industrial 2 of 5", 10, :left, 0)
-render_barcode(pdf, industrial2of5, 400, 500, 100, 60)
+render_barcode(pdf, industrial2of5, 400, 500, 120, 60)
 
 # row 6
 interleaved2of5 = Barcode1DTools::Interleaved2of5.new('1234567890')
