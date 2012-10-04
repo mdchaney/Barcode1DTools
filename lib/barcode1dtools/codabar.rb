@@ -24,11 +24,12 @@ module Barcode1DTools
   # characters as part of the value.  When decoding, the start/stop
   # characters will be presented as A, B, C, or D.  
   #
-  # val = "A29322930C"
-  # bc = Barcode1DTools::Codabar.new(val)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
+  # == Example
+  #   val = "A29322930C"
+  #   bc = Barcode1DTools::Codabar.new(val)
+  #   pattern = bc.bars
+  #   rle_pattern = bc.rle
+  #   width = bc.width
   #
   # The object created is immutable.
   #
@@ -44,27 +45,28 @@ module Barcode1DTools
   # (dot, forward slash, colon, and plus sign) each have three wide
   # bars and all narrow spaces.
   #
+  # == Formats
   # There are three formats for the returned pattern:
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
-  #   wn -   The native format for this barcode type.  The string
-  #          consists of a series of "w" and "n" characters.  The first
-  #          item is always a black line, with subsequent characters
-  #          alternating between spaces and lines.  A "wide" item
-  #          is twice the width of a "narrow" item.
+  # *wn* - The native format for this barcode type.  The string
+  # consists of a series of "w" and "n" characters.  The first
+  # item is always a black line, with subsequent characters
+  # alternating between spaces and lines.  A "wide" item
+  # is twice the width of a "narrow" item.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
   #
-  #== Rendering
+  # == Rendering
   #
   # The original Codabar specification actually included a varied
   # w/n ratio depending on whether there were two or three wide
@@ -122,21 +124,31 @@ module Barcode1DTools
       :varied_wn_ratio => false
     }
 
-    attr_reader :start_character, :stop_character, :payload
+    # Holds the start character
+    attr_reader :start_character
+    # Holds the stop character
+    attr_reader :stop_character
+    # The actual payload (between start/stop characters)
+    attr_reader :payload
 
     class << self
-      # Codabar can encode digits, dash, dollar, colon, forward
-      # slash, dot, and plus.  The string must start and stop with
-      # start/stop characters.
+
+      # Returns true if the value presented can be encoded in a
+      # Codabar barcode.  Codabar can encode digits, dash,
+      # dollar, colon, forward slash, dot, and plus.  The string
+      # must start and stop with start/stop characters.
       def can_encode?(value)
         value.to_s =~ /\A[ABCD][0-9\$:\/\.\+\-]*[ABCD]\z/ || value.to_s =~ /\A[TN\*E][0-9\$:\/\.\+\-]*[TN\*E]\z/
       end
 
-      # We don't generate a check digit
+      # Generate a check digit.  For Codabar, this
+      # will raise a NotImplementedError.
       def generate_check_digit_for(value)
         raise NotImplementedError
       end
 
+      # Validate the check digit.  For Codabar, this
+      # will raise a NotImplementedError.
       def validate_check_digit_for(value)
         raise NotImplementedError
       end
@@ -195,8 +207,8 @@ module Barcode1DTools
 
     end
 
-    # Options are :line_character, :space_character, :w_character,
-    # :n_character, and :varied_wn_ratio.
+    # Create a new Codabar object.  Options are :line_character,
+    # :space_character, :w_character, :n_character, and :varied_wn_ratio.
     def initialize(value, options = {})
 
       @options = DEFAULT_OPTIONS.merge(options)
@@ -217,7 +229,7 @@ module Barcode1DTools
       @wn ||= wn_str.tr('wn', @options[:w_character].to_s + @options[:n_character].to_s)
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       if @options[:varied_wn_ratio]
         @rle ||= @encoded_string.split('').collect { |c| PATTERNS[c]['wn'] }.collect { |p| p.tr('wn',(p=~/.*w.*w.*w/ ? '21' : '31')) }.join('1')
@@ -226,12 +238,12 @@ module Barcode1DTools
       end
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns the bar pattern
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

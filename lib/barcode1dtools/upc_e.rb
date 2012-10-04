@@ -9,20 +9,21 @@ require 'barcode1dtools/upc_a'
 
 module Barcode1DTools
 
-  # Barcode1DTools::UPC_E - Create pattern for UPC-E barcodes
-  #
+  # Barcode1DTools::UPC_E - Create pattern for UPC-E barcodes.
   # The value encoded is an 6-digit integer, and a checksum digit
   # will be added.  You can add the option :checksum_included => true
   # when initializing to specify that you have already included a
   # checksum.
   #
-  # num = '394932'
-  # bc = Barcode1DTools::UPC_E.new(num)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
-  # check_digit = Barcode1DTools::UPC_E.generate_check_digit_for(num)
+  # == Example
+  #  num = '394932'
+  #  bc = Barcode1DTools::UPC_E.new(num)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
+  #  check_digit = Barcode1DTools::UPC_E.generate_check_digit_for(num)
   #
+  # == Other Information
   # A UPC-E barcode is an abbreviated form of UPC-A, but can encode
   # only a few codes.  The checksum is derived from the full UPC-A
   # digit sequence rather than the 6 digits of the UPC-E.  The checksum
@@ -32,23 +33,43 @@ module Barcode1DTools
   # The last digit of the UPC-E determines the pattern used to convert
   # to a UPC-A.
   #
-  # UPC-E      UPC-A equivalent
-  # 2 digits for manufacturer code (plus last digit), 3 digits for product
-  # XXNNN0     0XX000-00NNN
-  # XXNNN1     0XX100-00NNN
-  # XXNNN2     0XX200-00NNN
-  # 3 digits for manufacturer code, 2 digits for product
-  # XXXNN3     0XXX00-000NN
-  # 4 digits for manufacturer code, 1 digit for product
-  # XXXXN4     0XXXX0-0000N
-  # 5 digits for manufacturer code, 1 digit for product (5-9)
-  # XXXXX5     0XXXXX-00005
-  # XXXXX6     0XXXXX-00006
-  # XXXXX7     0XXXXX-00007
-  # XXXXX8     0XXXXX-00008
-  # XXXXX9     0XXXXX-00009
+  #  UPC-E      UPC-A equivalent
+  #  2 digits for manufacturer code (plus last digit), 3 digits for product
+  #  XXNNN0     0XX000-00NNN
+  #  XXNNN1     0XX100-00NNN
+  #  XXNNN2     0XX200-00NNN
+  #  3 digits for manufacturer code, 2 digits for product
+  #  XXXNN3     0XXX00-000NN
+  #  4 digits for manufacturer code, 1 digit for product
+  #  XXXXN4     0XXXX0-0000N
+  #  5 digits for manufacturer code, 1 digit for product (5-9)
+  #  XXXXX5     0XXXXX-00005
+  #  XXXXX6     0XXXXX-00006
+  #  XXXXX7     0XXXXX-00007
+  #  XXXXX8     0XXXXX-00008
+  #  XXXXX9     0XXXXX-00009
   #
-  #== Rendering
+  # == Formats
+  # There are two formats for the returned pattern (wn format is
+  # not available):
+  #
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
+  #
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
+  #
+  # The "width" method will tell you the total end-to-end width, in
+  # units, of the entire barcode.
+  #
+  # Unlike some of the other barcodes, e.g. Code 3 of 9, there is no "w/n" format for
+  # EAN & UPC style barcodes because the bars and spaces are variable width from
+  # 1 to 4 units.
+  # 
+  # == Rendering
   #
   # The UPC-E is made for smaller items.  Generally, they are rendered
   # with the number system digit (0) on the left of the bars and the
@@ -61,9 +82,12 @@ module Barcode1DTools
 
   class UPC_E < Barcode1D
 
+    # Using the left patterns from UPC-A
     LEFT_PATTERNS = UPC_A::LEFT_PATTERNS
+    # Using the left patterns from UPC-A
     LEFT_PATTERNS_RLE = UPC_A::LEFT_PATTERNS_RLE
 
+    # UPC-E uses a different set of parity patterns to encode the check digit.
     PARITY_PATTERNS = {
       '0' => 'eeeooo',
       '1' => 'eeoeoo',
@@ -77,9 +101,13 @@ module Barcode1DTools
       '9' => 'eooeoe',
     };
 
+    # Left guard pattern
     LEFT_GUARD_PATTERN = '101'
+    # Right guard pattern
     RIGHT_GUARD_PATTERN = '010101'
+    # Left guard pattern as RLE
     LEFT_GUARD_PATTERN_RLE = '111'
+    # Right guard pattern as RLE
     RIGHT_GUARD_PATTERN_RLE = '111111'
 
     DEFAULT_OPTIONS = {
@@ -87,10 +115,13 @@ module Barcode1DTools
       :space_character => '0'
     }
 
-    # For UPC-E
+    # For UPC-E - the number system part of the item number
     attr_reader :number_system
+    # For UPC-E - the manufacturer's code part of the item number
     attr_reader :manufacturers_code
+    # For UPC-E - the product code part of the item number
     attr_reader :product_code
+    # For UPC-E - the UPC-A value for this UPC-E value
     attr_reader :upca_value
 
     class << self
@@ -112,7 +143,7 @@ module Barcode1DTools
         UPC_A.generate_check_digit_for(self.upce_value_to_upca_value(value))
       end
 
-      # validates the check digit given a string - assumes check digit
+      # Validates the check digit given a string - assumes check digit
       # is last digit of string.
       def validate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value, :checksum_included => true)
@@ -120,6 +151,8 @@ module Barcode1DTools
         self.generate_check_digit_for(md[1]) == md[2].to_i
       end
 
+      # Decodes a bar pattern or rle string that represents a UPC-E.  Returns
+      # a UPC_E object.
       def decode(str)
         if str.length == 51
           # bar pattern
@@ -175,6 +208,7 @@ module Barcode1DTools
         UPC_E.new('0' + digits + parity_digit, :checksum_included => true)
       end
 
+      # Converts the given UPC-E value to a UPC-A value.
       def upce_value_to_upca_value(value, options = {})
         raise UnencodableCharactersError unless self.can_encode?(value, options)
         # remove the check digit if it was included
@@ -194,6 +228,7 @@ module Barcode1DTools
         upca_value
       end
 
+      # Converts the given UPC-A value to a UPC-E value.
       def upca_value_to_upce_value(value, options = {})
         raise UnencodableCharactersError unless UPC_A.can_encode?(value, options)
         value = value % 10 if options[:checksum_included]
@@ -213,6 +248,7 @@ module Barcode1DTools
       end
     end
 
+    # Create a new UPC-E object for a given value.
     # Options are :line_character, :space_character, and
     # :checksum_included.
     def initialize(value, options = {})
@@ -239,12 +275,12 @@ module Barcode1DTools
       @number_system, @manufacturers_code, @product_code = md[1], md[2], md[3]
     end
 
-    # not usable with EAN-style codes
+    # W/N strings are not usable with EAN-style codes.
     def wn
       raise NotImplementedError
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation.
     def rle
       if @rle
         @rle
@@ -254,17 +290,17 @@ module Barcode1DTools
       end
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns a bar pattern.
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code.
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end
 
-    # Returns a UPC_A object with the same value
+    # Returns a UPC_A object with the same value.
     def to_upc_a
       UPC_A.new(self.class.upce_value_to_upca_value(@value), options.merge(:checksum_included => false))
     end

@@ -18,11 +18,12 @@ module Barcode1DTools
   # PostNet is used by the USPS for mail sorting, although it
   # is technically deprecated.
   #
-  # val = "37211"
-  # bc = Barcode1DTools::PostNet.new(val)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
+  # == Example
+  #  val = "37211"
+  #  bc = Barcode1DTools::PostNet.new(val)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
   #
   # The object created is immutable.
   #
@@ -31,27 +32,28 @@ module Barcode1DTools
   # string.  In this symbology, "wide" means "tall" and "narrow"
   # means "short".
   #
+  # == Formats
   # There are three formats for the returned pattern:
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
-  #   wn -   The native format for this barcode type.  The string
-  #          consists of a series of "w" and "n" characters.  The first
-  #          item is always a black line, with subsequent characters
-  #          alternating between spaces and lines.  A "wide" item
-  #          is twice the width of a "narrow" item.
+  # *wn* - The native format for this barcode type.  The string
+  # consists of a series of "w" and "n" characters.  The first
+  # item is always a black line, with subsequent characters
+  # alternating between spaces and lines.  A "wide" item
+  # is twice the width of a "narrow" item.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
   #
-  #== Rendering
+  # == Rendering
   #
   # See USPS documentation for exact specifications for display.
 
@@ -78,7 +80,9 @@ module Barcode1DTools
       '9'=> {'val'=>9 ,'wn'=>'wnwnn'}
     }
 
+    # Left guard pattern
     GUARD_PATTERN_LEFT_WN = 'w'
+    # Right guard pattern
     GUARD_PATTERN_RIGHT_WN = 'w'
 
     DEFAULT_OPTIONS = {
@@ -90,16 +94,19 @@ module Barcode1DTools
 
     class << self
       # PostNet can encode 5, 9, or 11 digits, plus a check digit.
+      # This returns true if the value is encodable.
       def can_encode?(value)
         value.to_s =~ /\A\d{5}(\d{4})?(\d{2})?\d?\z/
       end
 
+      # Generate the check digit for a given value.
       def generate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value)
         value = value.split('').collect { |c| c.to_i }.inject(0) { |a,c| a + c }
         (10 - (value % 10)) % 10
       end
 
+      # Validate the check digit for a given value.
       def validate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value)
         md = value.match(/^(\d+?)(\d)$/)
@@ -152,6 +159,7 @@ module Barcode1DTools
 
     end
 
+    # Create a new PostNet object with the given value.
     # Options are :line_character, :space_character, :w_character,
     # :n_character, :checksum_included, and :skip_checksum.
     def initialize(value, options = {})
@@ -196,17 +204,17 @@ module Barcode1DTools
       @wn ||= wn_str.tr('wn', @options[:w_character].to_s + @options[:n_character].to_s)
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       @rle ||= self.class.wn_to_rle(self.wn, @options)
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns 1s and 0s (for "black" and "white")
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

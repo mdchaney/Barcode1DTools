@@ -20,11 +20,26 @@ module Barcode1DTools
   # Because of this, there are no options for including a check
   # digit or validating one.  It is always included.
   #
-  # val = "29382-38"
-  # bc = Barcode1DTools::Code128.new(val)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
+  # Be sure to use Latin-1 (ISO-8859-1) in Ruby 1.9+ for any
+  # strings that use high characters.  They will be encoded and
+  # decoded properly.
+  #
+  # == Example
+  #  val = "This is a test"
+  #  bc = Barcode1DTools::Code128.new(val)
+  #  # Pass an array if you wish to use FNC characters
+  #  val = [:fnc_1, "42184037211"]
+  #  bc = Barcode1DTools::Code128.new(val)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
+  #
+  # It is possible to pass a raw value to be encoded by using the
+  # option :raw_value => true when creating the object.  This
+  # must include the start character, string (each character
+  # being between 0 and 105 inclusive), the checksum character,
+  # and the stop character.  No checks are performed on the
+  # string.
   #
   # The object created is immutable.
   #
@@ -34,21 +49,22 @@ module Barcode1DTools
   #
   # Code128 characters consist of 3 bars and 3 spaces.
   #
+  # == Formats
   # There are two formats for the returned pattern:
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
   #
-  #== Rendering
+  # == Rendering
   #
   # The quiet zone on each side should be at least the greater of 10
   # unit widths or 6.4mm.  Typically a textual rendition of the
@@ -79,7 +95,7 @@ module Barcode1DTools
       '2331112'
     ]
 
-    # Quicker decoding
+    # Helps with quicker decoding
     PATTERN_LOOKUP = (0..106).inject({}) { |a,c| a[PATTERNS[c]] = c; a }
 
     # For ease.  These can also be looked up in any
@@ -98,11 +114,15 @@ module Barcode1DTools
     FNC_3 = 96
     # Note that FNC_4 is 100 in set B and 101 in set A
 
+    # Guard/start patterns
     GUARD_PATTERN_RIGHT_RLE = PATTERNS[STOP]
     START_A_RLE = PATTERNS[START_A]
     START_B_RLE = PATTERNS[START_B]
     START_C_RLE = PATTERNS[START_C]
 
+    # These are the standard labels for the low-ascii (0-31) characters.
+    # They aren't actually used here, but are included as they are
+    # useful for debugging.
     LOW_ASCII_LABELS = [
       'NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK', 'BEL',
       'BS', 'HT', 'LF', 'VT', 'FF', 'CR', 'SO', 'SI', 'DLE',
@@ -137,11 +157,17 @@ module Barcode1DTools
     }
 
     class << self
-      # Code128 can encode anything
+      # Returns true if Code128 can encode the value.
+      # Code128 can encode anything, so this is always true.
       def can_encode?(value)
         true
       end
 
+      # Generates the check digit for the encoded string.  Code 128
+      # creates the check digit based on the encoded value, so it's of
+      # no use outside of this module.  Because the same payload may
+      # be represented in more than one way, the check digit can't be
+      # determined from the original payload value.
       def generate_check_digit_for(value)
         md = parse_code128(value)
         start = md[1].unpack('C')
@@ -149,30 +175,32 @@ module Barcode1DTools
         [md[2].unpack('C*').inject(start.first) { |a,c| (mult+=1)*c+a } % 103].pack('C')
       end
 
+      # Validates the check digit given an encoded value.
       def validate_check_digit_for(value)
         payload, check_digit = split_payload_and_check_digit(value)
         self.generate_check_digit_for(payload) == check_digit
       end
 
+      # Splits the payload (raw) and check digit.
       def split_payload_and_check_digit(value)
         md = value.to_s.match(/\A(.*)(.)\z/)
         [md[1], md[2]]
       end
 
-      # Returns match data - 1: start character 2: payload
-      # 3: check digit 4: stop character
+      # Given a raw encoded value, this returns match data -
+      # 1: start character 2: payload 3: check digit 4: stop
+      # character.
       def parse_code128(str)
         str.match(/\A([\x67-\x69])([\x00-\x66]*?)(?:([\x00-\x66])(\x6a))?\z/)
       end
 
       # Convert a code128 encoded string to an ASCII/Latin-1
-      # representation.  The return value is an array if there
-      # are any FNC codes included.  Use the option
-      # :no_latin1 => true to simply return FNC 4 instead of
-      # coding the following characters to the high Latin-1
+      # representation.  The return value is an array Use the
+      # option :no_latin1 => true to simply return FNC 4 instead
+      # of coding the following characters to the high Latin-1
       # range.  Use :raw_array => true if you wish to see an
-      # array of the actual characters in the code.  It will
-      # turn any ASCII/Latin-1 characters to their standard
+      # array of the actual characters in the code.  It will turn
+      # any ASCII/Latin-1 characters to their standard
       # representation, but it also includes all start, shift,
       # code change, etc. characters.  Useful for debugging.
       def code128_to_latin1(str, options = {})
@@ -449,6 +477,7 @@ module Barcode1DTools
 
     end
 
+    # Create a new Code128 object given a value.
     # Options are :line_character, :space_character, and
     # :raw_value.
     def initialize(value, options = {})
@@ -488,22 +517,22 @@ module Barcode1DTools
       @check_digit = md[3]
     end
 
-    # variable bar width, no w/n string
+    # Code 128 is variable bar width, no w/n string
     def wn
       raise NotImplementedError
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       @rle ||= gen_rle(@encoded_string, @options)
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns 1s and 0s (for "black" and "white")
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

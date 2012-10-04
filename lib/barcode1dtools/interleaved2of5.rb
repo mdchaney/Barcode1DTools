@@ -22,13 +22,14 @@ module Barcode1DTools
   # an odd number of digits is encoded with 5 narrow spaces for the last
   # digit.  We do not encode this way but can handle decoding.
   #
-  # num = 238982
-  # bc = Barcode1DTools::Interleaved2of5.new(num)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # wn_pattern = bc.wn
-  # width = bc.width
-  # check_digit = Barcode1DTools::Interleaved2of5.generate_check_digit_for(num)
+  # == Example
+  #  num = 238982
+  #  bc = Barcode1DTools::Interleaved2of5.new(num)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  wn_pattern = bc.wn
+  #  width = bc.width
+  #  check_digit = Barcode1DTools::Interleaved2of5.generate_check_digit_for(num)
   #
   # The object created is immutable.
   #
@@ -40,22 +41,23 @@ module Barcode1DTools
   # "narrow", with "wide" lines or spaces being twice the width of
   # narrow lines or spaces.
   #
+  # == Formats
   # There are three formats for the returned pattern:
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
-  #   wn -   The native format for this barcode type.  The string
-  #          consists of a series of "w" and "n" characters.  The first
-  #          item is always a black line, with subsequent characters
-  #          alternating between spaces and lines.  A "wide" item
-  #          is twice the width of a "narrow" item.
+  # *wn* - The native format for this barcode type.  The string
+  # consists of a series of "w" and "n" characters.  The first
+  # item is always a black line, with subsequent characters
+  # alternating between spaces and lines.  A "wide" item
+  # is twice the width of a "narrow" item.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
@@ -71,7 +73,7 @@ module Barcode1DTools
 
   class Interleaved2of5 < Barcode1D
 
-    # patterns and such go here
+    # The patterns for each number and the guard patterns
     PATTERNS = {
       'start' => 'nnnn',
       '0' => 'nnwwn',
@@ -87,6 +89,7 @@ module Barcode1DTools
       'stop' => 'wnn'
     }
 
+    # Default w/n ratio.
     WN_RATIO = 2
 
     DEFAULT_OPTIONS = {
@@ -98,7 +101,7 @@ module Barcode1DTools
     }
 
     class << self
-      # returns true or false
+      # Returns true if the value can be encoded.
       def can_encode?(value)
         value.is_a?(Integer) || value.to_s =~ /^[0-9]+$/
       end
@@ -115,7 +118,7 @@ module Barcode1DTools
         (10 - (value % 10)) % 10
       end
 
-      # validates the check digit given a string - assumes check digit
+      # Validates the check digit given a string - assumes check digit
       # is last digit of string.
       def validate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value)
@@ -123,7 +126,7 @@ module Barcode1DTools
         self.generate_check_digit_for(md[1]) == md[2].to_i
       end
 
-      # Decode a string in wn format.  This will return an Interleaved2of5
+      # Decode a string in w/n format.  This will return an Interleaved2of5
       # object.
       def decode(str, options = {})
         if str =~ /[^wn]/
@@ -180,6 +183,7 @@ module Barcode1DTools
       end
     end
 
+    # Create a new Interleaved2of5 object with the given value.
     # Options are :line_character, :space_character, :w_character,
     # :n_character, :skip_checksum, and :checksum_included.
     def initialize(value, options = {})
@@ -213,17 +217,17 @@ module Barcode1DTools
       @wn ||= wn_str.tr('wn', @options[:w_character].to_s + @options[:n_character].to_s)
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       @rle ||= self.class.wn_to_rle(self.wn, @options)
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns 1s and 0s (for "black" and "white")
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

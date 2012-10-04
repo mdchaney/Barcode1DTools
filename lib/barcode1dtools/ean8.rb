@@ -9,34 +9,36 @@ require 'barcode1dtools/ean13'
 
 module Barcode1DTools
 
-  # Barcode1DTools::EAN_8 - Create pattern for EAN-8 barcodes
-  
+  # Barcode1DTools::EAN_8 - Create pattern for EAN-8 barcodes.
   # The value encoded is a 7-digit number, and a checksum digit will
   # be added.  You can add the option # :checksum_included => true
   # when initializing to specify that you have already included a
   # checksum.
   #
-  # num = '96385074'
-  # bc = Barcode1DTools::EAN8.new(num)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
-  # check_digit = Barcode1DTools::EAN83.generate_check_digit_for(num)
+  # == Example
+  #  num = '96385074'
+  #  bc = Barcode1DTools::EAN8.new(num)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
+  #  check_digit = Barcode1DTools::EAN83.generate_check_digit_for(num)
+  #
+  # == Other Information
   #
   # The object created is immutable.
   #
+  # == Formats
   # There are two formats for the returned pattern (wn format is
   # not available):
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.  Each character
-  #          in the string renders to a single unit width.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
@@ -45,19 +47,19 @@ module Barcode1DTools
   # EAN & UPC style barcodes because the bars and spaces are variable width from
   # 1 to 4 units.
   # 
-  # A EAN-8 barcode has 3 elements:
+  # An EAN-8 barcode has 3 elements:
   # 1. A 2 or 3 digit "number system" designation
   # 2. A 4 or 5 digit manufacturer's code
   # 3. A single digit checksum
   # 
   # Note than an EAN-8 is not analogous to a UPC-E.  In particular, there
   # is no way to create an EAN-13 from and EAN-8 and vice versa.  The
-  # numbers are assigned within each system by a central authority.
+  # numbers are assigned within EAN-8 by a central authority.
   #
   # The bar patterns are the same as EAN-13, with nothing encoded in the
   # parity.  All bars on the left use the "odd" parity set.
   # 
-  # RENDERING
+  # == Rendering
   # 
   # When rendered, two sets of four digits are shown at the bottom of the
   # code, aligned with the bottom of the code, and with the middle guard
@@ -66,15 +68,22 @@ module Barcode1DTools
 
   class EAN8 < Barcode1D
 
-    # patterns to create the bar codes:
+    # Left patterns from EAN-13
     LEFT_PATTERNS = EAN13::LEFT_PATTERNS
+    # Left rle patterns from EAN-13
     LEFT_PATTERNS_RLE = EAN13::LEFT_PATTERNS_RLE
+    # Right patterns from EAN-13
     RIGHT_PATTERNS = EAN13::RIGHT_PATTERNS
+    # Right rle patterns from EAN-13
     RIGHT_PATTERNS_RLE = EAN13::RIGHT_PATTERNS_RLE
 
+    # Guard pattern from EAN-13
     SIDE_GUARD_PATTERN=EAN13::SIDE_GUARD_PATTERN
+    # Middle Guard pattern from EAN-13
     MIDDLE_GUARD_PATTERN=EAN13::MIDDLE_GUARD_PATTERN
+    # Guard pattern from EAN-13 as an rle
     SIDE_GUARD_PATTERN_RLE=EAN13::SIDE_GUARD_PATTERN_RLE
+    # Middle Guard pattern from EAN-13 as an rle
     MIDDLE_GUARD_PATTERN_RLE=EAN13::MIDDLE_GUARD_PATTERN_RLE
 
     DEFAULT_OPTIONS = {
@@ -82,12 +91,13 @@ module Barcode1DTools
       :space_character => '0'
     }
 
-    # Specific for EAN
+    # Specific for EAN-8 - the number system part of the payload
     attr_reader :number_system
+    # Specific for EAN-8 - the product code part of the payload
     attr_reader :product_code
 
     class << self
-      # returns true or false - must be 7-8 digits
+      # Returns true if value can be encoded in EAN-8 - must be 7-8 digits.
       def can_encode?(value, options = nil)
         if !options
           value.to_s =~ /^\d{7,8}$/
@@ -107,7 +117,7 @@ module Barcode1DTools
         (10 - (value % 10)) % 10
       end
 
-      # validates the check digit given a string - assumes check digit
+      # Validates the check digit given a string - assumes check digit
       # is last digit of string.
       def validate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value, :checksum_included => true)
@@ -192,6 +202,7 @@ module Barcode1DTools
       end
     end
 
+    # Create an EAN8 object with a given value.
     # Options are :line_character, :space_character, and
     # :checksum_included.
     def initialize(value, options = {})
@@ -217,12 +228,13 @@ module Barcode1DTools
       @number_system, @product_code = md[1], md[2]
     end
 
-    # not usable with EAN codes
+    # EAN-based codes cannot create a w/n string, so this
+    # will raise an error.
     def wn
       raise NotImplementedError
     end
 
-    # returns a run-length-encoded string representation
+    # returns a run-length-encoded string representation.
     def rle
       if @rle
         @rle
@@ -232,12 +244,12 @@ module Barcode1DTools
       end
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns 1s and 0s (for "black" and "white")
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code.
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

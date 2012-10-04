@@ -7,60 +7,51 @@
 
 module Barcode1DTools
 
-  # Barcode1DTools::EAN_13 - Create pattern for EAN-13 barcodes
-  
+  # Barcode1DTools::EAN_13 - Create pattern for EAN-13 barcodes.
   # The value encoded is an
   # integer, and a checksum digit will be added.  You can add the option
   # :checksum_included => true when initializing to specify that you
   # have already included a checksum.
   #
-  # # Note that this number is a UPC-A, with the number system of 08,
-  # # manufacturer's code of "28999", product code of "00682", and a
-  # # checksum of "3" (not included)
-  # num = '082899900682'
-  # bc = Barcode1DTools::EAN13.new(num)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
-  # check_digit = Barcode1DTools::EAN13.generate_check_digit_for(num)
+  # == Example
+  #  # Note that this number is a UPC-A, with the number system of 08,
+  #  # manufacturer's code of "28999", product code of "00682", and a
+  #  # checksum of "3" (not included)
+  #  num = '082899900682'
+  #  bc = Barcode1DTools::EAN13.new(num)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
+  #  check_digit = Barcode1DTools::EAN13.generate_check_digit_for(num)
   #
   # The object created is immutable.
   #
+  # == Formats
   # There are two formats for the returned pattern (wn format is
   # not available):
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.  Each character
-  #          in the string renders to a single unit width.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
   #
-  # Unlike some of the other barcodes, e.g. Code 3 of 9, there is no "wnstr" for
+  # Unlike some of the other barcodes, e.g. Code 3 of 9, there is no "w/n" format for
   # EAN & UPC style barcodes because the bars and spaces are variable width from
-  # 1 to 3 units.
+  # 1 to 4 units.
   # 
-  # Note that JAN codes (Japanese) are simply EAN-13's, and they always start with
-  # "49".  The table below shows "49" to be "Japan".
-  # 
-  # Also note that many books use a "bookland" code, perhaps along with a UPC
-  # Supplemental.  The bookland code is really an EAN-13 with the initial 3 digits
-  # of "978".  The next 9 digits are the first 9 digits of the ISBN, and of course
-  # we still include the final check digit.  An ISBN is 10 digits, however, the
-  # final digit is also a check digit, so it is not necessary.
-  # 
-  # MISCELLANEOUS INFORMATION
+  # == Miscellaneous Information
   # 
   # An EAN-13 with an initial "number system" digit of "0" is a UPC-A.
   # The BarcodeTools::UPC_A module actually just uses this EAN13 module.
   # 
-  # A EAN-13 barcode has 4 elements:
+  # An EAN-13 barcode has 4 elements:
   # 1. A two-digit "number system" designation
   # 2. A 5-digit manufacturer's code
   # 3. A 5-digit product code
@@ -71,45 +62,54 @@ module Barcode1DTools
   # systems are further split up.  An example is "74", which is used for
   # Central America with "740" for Guatemala, "741" for El Salvador, etc.
   # 
+  # Note that JAN codes (Japanese) are simply EAN-13's, and they always start with
+  # "49".  The table below shows "49" to be "Japan".
+  # 
+  # Also note that many books use a "bookland" code, perhaps along with a UPC
+  # Supplemental.  The bookland code is really an EAN-13 with the initial 3 digits
+  # of "978".  The next 9 digits are the first 9 digits of the ISBN, and of course
+  # we still include the final check digit.  An ISBN is 10 digits, however, the
+  # final digit is also a check digit, so it is not necessary.
+  # 
   # Here is the complete table from www.barcodeisland.com:
   # 
-  # 00-13: USA & Canada          590: Poland               780: Chile
-  # 20-29: In-Store Functions    594: Romania              784: Paraguay
-  # 30-37: France                599: Hungary              785: Peru
-  # 40-44: Germany               600 & 601: South Africa   786: Ecuador
-  # 45:  Japan (also 49)         609: Mauritius            789: Brazil
-  # 46:  Russian Federation      611: Morocco              80 - 83: Italy
-  # 471: Taiwan                  613: Algeria              84: Spain
-  # 474: Estonia                 619: Tunisia              850: Cuba
-  # 475: Latvia                  622: Egypt                858: Slovakia
-  # 477: Lithuania               625: Jordan               859: Czech Republic
-  # 479: Sri Lanka               626: Iran                 860: Yugloslavia
-  # 480: Philippines             64:  Finland              869: Turkey
-  # 482: Ukraine                 690-692: China            87:  Netherlands
-  # 484: Moldova                 70:  Norway               880: South Korea
-  # 485: Armenia                 729: Israel               885: Thailand
-  # 486: Georgia                 73:  Sweden               888: Singapore
-  # 487: Kazakhstan              740: Guatemala            890: India
-  # 489: Hong Kong               741: El Salvador          893: Vietnam
-  # 49:  Japan (JAN-13)          742: Honduras             899: Indonesia
-  # 50:  United Kingdom          743: Nicaragua            90 & 91: Austria
-  # 520: Greece                  744: Costa Rica           93:  Australia
-  # 528: Lebanon                 746: Dominican Republic   94:  New Zealand
-  # 529: Cyprus                  750: Mexico               955: Malaysia
-  # 531: Macedonia               759: Venezuela            977: ISSN
-  # 535: Malta                   76:  Switzerland          978: ISBN
-  # 539: Ireland                 770: Colombia             979: ISMN
-  # 54:  Belgium & Luxembourg    773: Uruguay              980: Refund receipts
-  # 560: Portugal                775: Peru                 981 & 982: CCC
-  # 569: Iceland                 777: Bolivia              99:  Coupons
-  # 57:  Denmark                 779: Argentina
+  #  00-13: USA & Canada          590: Poland               780: Chile
+  #  20-29: In-Store Functions    594: Romania              784: Paraguay
+  #  30-37: France                599: Hungary              785: Peru
+  #  40-44: Germany               600 & 601: South Africa   786: Ecuador
+  #  45:  Japan (also 49)         609: Mauritius            789: Brazil
+  #  46:  Russian Federation      611: Morocco              80 - 83: Italy
+  #  471: Taiwan                  613: Algeria              84: Spain
+  #  474: Estonia                 619: Tunisia              850: Cuba
+  #  475: Latvia                  622: Egypt                858: Slovakia
+  #  477: Lithuania               625: Jordan               859: Czech Republic
+  #  479: Sri Lanka               626: Iran                 860: Yugloslavia
+  #  480: Philippines             64:  Finland              869: Turkey
+  #  482: Ukraine                 690-692: China            87:  Netherlands
+  #  484: Moldova                 70:  Norway               880: South Korea
+  #  485: Armenia                 729: Israel               885: Thailand
+  #  486: Georgia                 73:  Sweden               888: Singapore
+  #  487: Kazakhstan              740: Guatemala            890: India
+  #  489: Hong Kong               741: El Salvador          893: Vietnam
+  #  49:  Japan (JAN-13)          742: Honduras             899: Indonesia
+  #  50:  United Kingdom          743: Nicaragua            90 & 91: Austria
+  #  520: Greece                  744: Costa Rica           93:  Australia
+  #  528: Lebanon                 746: Dominican Republic   94:  New Zealand
+  #  529: Cyprus                  750: Mexico               955: Malaysia
+  #  531: Macedonia               759: Venezuela            977: ISSN
+  #  535: Malta                   76:  Switzerland          978: ISBN
+  #  539: Ireland                 770: Colombia             979: ISMN
+  #  54:  Belgium & Luxembourg    773: Uruguay              980: Refund receipts
+  #  560: Portugal                775: Peru                 981 & 982: CCC
+  #  569: Iceland                 777: Bolivia              99:  Coupons
+  #  57:  Denmark                 779: Argentina
+  #
+  # ISSN:: International Standard Serial Number for Periodicals
+  # ISBN:: International Standard Book Numbering
+  # ISMN:: International Standard Music Number
+  # CCC:: Common Currency Coupons
   # 
-  # ISSN - International Standard Serial Number for Periodicals
-  # ISBN - International Standard Book Numbering
-  # ISMN - International Standard Music Number
-  # CCC  - Common Currency Coupons
-  # 
-  # RENDERING
+  # == Rendering
   # 
   # When rendered, the initial digit of the number system is shown to the
   # left and above the rest of the digits.  The other two sets of six
@@ -117,13 +117,13 @@ module Barcode1DTools
   # bottom of the code, and with the middle guard pattern bars extending
   # down between them.  The lower digits may be aligned flush with the
   # bottom of the barcode, or the center of the text may be aligned with the
-  # bottom of the barcode.
+  # bottom of the barcode.  Typically, the barcode is 1-1.5" across and 60%
+  # or more of the width in height.  There should be at least 10 units of
+  # quiet space on each side.
 
   class EAN13 < Barcode1D
 
-    # patterns to create the bar codes:
-
-    # left side, odd/even
+    # Patterns for the left side, split between odd and even parity
     LEFT_PATTERNS = {
       '0' => { 'o' => '0001101', 'e' => '0100111'},
       '1' => { 'o' => '0011001', 'e' => '0110011'},
@@ -135,9 +135,11 @@ module Barcode1DTools
       '7' => { 'o' => '0111011', 'e' => '0010001'},
       '8' => { 'o' => '0110111', 'e' => '0001001'},
       '9' => { 'o' => '0001011', 'e' => '0010111'},
-    };
+    }
 
-    # All left patterns start with a space and end with a bar
+    # Patterns for the left side, split between odd and even parity, in
+    # RLE format.  Note that all left side patterns start with a space
+    # and end with a bar.
     LEFT_PATTERNS_RLE = {
       '0' => { 'o' => '3211', 'e' => '1123'},
       '1' => { 'o' => '2221', 'e' => '1222'},
@@ -149,8 +151,9 @@ module Barcode1DTools
       '7' => { 'o' => '1312', 'e' => '2131'},
       '8' => { 'o' => '1213', 'e' => '3121'},
       '9' => { 'o' => '3112', 'e' => '2113'},
-    };
+    }
 
+    # Left parity patterns.  An extra digit is encoded in the parity.
     LEFT_PARITY_PATTERNS = {
       '0' => 'oooooo',
       '1' => 'ooeoee',
@@ -162,9 +165,9 @@ module Barcode1DTools
       '7' => 'oeoeoe',
       '8' => 'oeoeeo',
       '9' => 'oeeoeo',
-    };
+    }
 
-    # right side
+    # Bar patterns for right side.
     RIGHT_PATTERNS = {
       '0' => '1110010',
       '1' => '1100110',
@@ -176,9 +179,10 @@ module Barcode1DTools
       '7' => '1000100',
       '8' => '1001000',
       '9' => '1110100',
-    };
+    }
 
-    # All right patterns start with a bar and end with a space
+    # Bar patterns for right side as RLE.  Note that on the right
+    # side each pattern starts with a bar and ends with a space.
     RIGHT_PATTERNS_RLE = {
       '0' => '3211',
       '1' => '2221',
@@ -190,15 +194,15 @@ module Barcode1DTools
       '7' => '1312',
       '8' => '1213',
       '9' => '3112',
-    };
+    }
 
     # AAAAHHHHHHHHH side + middle + side is 666, the number of the beast
     SIDE_GUARD_PATTERN='101';
     MIDDLE_GUARD_PATTERN='01010';
 
-    # Starts with bar
+    # Side guard pattern - Starts with bar
     SIDE_GUARD_PATTERN_RLE='111';
-    # Starts with space
+    # Middle guard pattern - Starts with space
     MIDDLE_GUARD_PATTERN_RLE='11111';
 
     DEFAULT_OPTIONS = {
@@ -206,13 +210,15 @@ module Barcode1DTools
       :space_character => '0'
     }
 
-    # Specific for EAN
+    # Specific for EAN - the number system part of the payload
     attr_reader :number_system
+    # Specific for EAN - the manufacturer's code part of the payload
     attr_reader :manufacturers_code
+    # Specific for EAN - the product code part of the payload
     attr_reader :product_code
 
     class << self
-      # returns true or false - must be 12-13 digits
+      # Returns true if value can be encoded.  Must be 12 or 13 digits.
       def can_encode?(value, options = nil)
         if !options
           value.to_s =~ /^[0-9]{12,13}$/
@@ -232,7 +238,7 @@ module Barcode1DTools
         (10 - (value % 10)) % 10
       end
 
-      # validates the check digit given a string - assumes check digit
+      # Validates the check digit given a string - assumes check digit
       # is last digit of string.
       def validate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value, :checksum_included => true)
@@ -329,6 +335,7 @@ module Barcode1DTools
       end
     end
 
+    # Create a new EAN-13 barcode object.
     # Options are :line_character, :space_character, and
     # :checksum_included.
     def initialize(value, options = {})
@@ -354,12 +361,13 @@ module Barcode1DTools
       @number_system, @manufacturers_code, @product_code = md[1], md[2], md[3]
     end
 
-    # not usable with EAN codes
+    # Note that EANs cannot produce a w/n string, so this
+    # will raise an error.
     def wn
       raise NotImplementedError
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       if @rle
         @rle
@@ -369,12 +377,12 @@ module Barcode1DTools
       end
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns 1s and 0s (for "black" and "white")
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

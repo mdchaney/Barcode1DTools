@@ -22,14 +22,15 @@ module Barcode1DTools
   # dash "-", period ".", dollar sign "$", forward slash "/", plus
   # sign "+", percent sign "%", as well as a space " ".
   #
-  # val = "THIS IS A TEST"
-  # bc = Barcode1DTools::Code3of9.new(val)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # wn_pattern = bc.wn
-  # width = bc.width
-  # # Note that the check digit is actually one of the characters.
-  # check_digit = Barcode1DTools::Code3of9.generate_check_digit_for(num)
+  # == Example
+  #  val = "THIS IS A TEST"
+  #  bc = Barcode1DTools::Code3of9.new(val)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  wn_pattern = bc.wn
+  #  width = bc.width
+  #  # Note that the check digit is actually one of the characters.
+  #  check_digit = Barcode1DTools::Code3of9.generate_check_digit_for(num)
   #
   # The object created is immutable.
   #
@@ -41,27 +42,28 @@ module Barcode1DTools
   # "wide" or "narrow", with "wide" lines or spaces being twice the
   # width of narrow lines or spaces.
   #
+  # == Formats
   # There are three formats for the returned pattern:
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
-  #   wn -   The native format for this barcode type.  The string
-  #          consists of a series of "w" and "n" characters.  The first
-  #          item is always a black line, with subsequent characters
-  #          alternating between spaces and lines.  A "wide" item
-  #          is twice the width of a "narrow" item.
+  # *wn* - The native format for this barcode type.  The string
+  # consists of a series of "w" and "n" characters.  The first
+  # item is always a black line, with subsequent characters
+  # alternating between spaces and lines.  A "wide" item
+  # is twice the width of a "narrow" item.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
   #
-  #== Miscellaneous Information
+  # == Miscellaneous Information
   #
   # Code 3 of 9 can encode text and digits.  There is also a way to do
   # "full ascii" mode, but it's not recommended.  Full ascii mode uses
@@ -72,14 +74,14 @@ module Barcode1DTools
   # only for shifting.  However, if you need to use a full character
   # set, Code 128 is probably a better choice.
   #
-  # Note:
+  # *Note:*
   # Please note that Code 3 of 9 is not suggested for new applications
   # due to the fact that the code is sparse and doesn't encode a full
   # range of characters without using the "full ascii extensions",
   # which cause it to be even more sparse.  For newer 1D applications
   # use Code 128.
   #
-  #== Rendering
+  # == Rendering
   #
   # Code 3 of 9 may be rendered however the programmer wishes.  Since
   # there is a simple mapping between number of characters and length of
@@ -145,8 +147,13 @@ module Barcode1DTools
       '%' => { 'position' => 42, 'wn' => 'nnnwnwnwn' }
     }
 
+    # Guard pattern
     SIDE_GUARD_PATTERN = 'nwnnwnwnn'
 
+    # This table is useful for implementing "full ascii" mode.
+    # It is a 128 element array that will return the character
+    # or characters to represent the ascii character at a
+    # particular code point.
     FULL_ASCII_LOOKUP = [
       '%U', '$A', '$B', '$C', '$D', '$E', '$F', '$G', '$H', '$I',
       '$J', '$K', '$L', '$M', '$N', '$O', '$P', '$Q', '$R', '$S',
@@ -163,6 +170,9 @@ module Barcode1DTools
       '%S', '%T'
     ]
 
+    # This is a reverse lookup.  Given a character or character pair
+    # from a "full ascii" representation this will give the ascii
+    # code point as well as a character name.
     FULL_ASCII_REVERSE_LOOKUP = {
       '%U' => { 'position' => 0,  'name' => '<NUL>' },
       '$A' => { 'position' => 1,  'name' => '<SOH>' },
@@ -297,6 +307,7 @@ module Barcode1DTools
       '%Z' => { 'position' => 127, 'name' => '<DEL>' }
     }
 
+    # Default w/n ratio.
     WN_RATIO = 2
 
     DEFAULT_OPTIONS = {
@@ -309,7 +320,9 @@ module Barcode1DTools
     }
 
     class << self
-      # returns true or false
+      # Returns true if the given value can be encoded
+      # in the Code 3 of 9 symbology.  See CHAR_SEQUENCE
+      # for a full list of characters and their positions.
       def can_encode?(value)
         value.to_s =~ /\A[0-9A-Z\-\. \$\/\+%]*\z/
       end
@@ -325,7 +338,7 @@ module Barcode1DTools
         CHAR_SEQUENCE[sum % 43,1]
       end
 
-      # validates the check digit given a string - assumes check digit
+      # Validates the check digit given a string - assumes check digit
       # is last digit of string.
       def validate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value)
@@ -398,6 +411,7 @@ module Barcode1DTools
       end
     end
 
+    # Create a new Code3of9 barcode object.
     # Options are :line_character, :space_character, :w_character,
     # :n_character, :skip_checksum, and :checksum_included.
     def initialize(value, options = {})
@@ -432,17 +446,17 @@ module Barcode1DTools
       @wn ||= wn_str.tr('wn', @options[:w_character].to_s + @options[:n_character].to_s)
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       @rle ||= self.class.wn_to_rle(self.wn, @options)
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns 1s and 0s (for "black" and "white")
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

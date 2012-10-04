@@ -16,14 +16,15 @@ module Barcode1DTools
   # checksum and wish to have it validated, or :skip_checksum =>
   # true if you don't wish to add one or have it validated.
   #
-  # COOP 2 of 5 is low-density and limited.  It should not be
+  # *Note:* COOP 2 of 5 is low-density and limited.  It should not be
   # used in any new applications.
   #
-  # val = "3423"
-  # bc = Barcode1DTools::Coop2of5.new(val)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
+  # == Example
+  #  val = "3423"
+  #  bc = Barcode1DTools::Coop2of5.new(val)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
   #
   # The object created is immutable.
   #
@@ -34,27 +35,28 @@ module Barcode1DTools
   # Coop2of5 characters consist of 3 bars and 2 spaces, with a narrow
   # space between them.  2 of the bars/spaces in each symbol are wide.
   #
+  # == Formats
   # There are three formats for the returned pattern:
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
-  #   wn -   The native format for this barcode type.  The string
-  #          consists of a series of "w" and "n" characters.  The first
-  #          item is always a black line, with subsequent characters
-  #          alternating between spaces and lines.  A "wide" item
-  #          is twice the width of a "narrow" item.
+  # *wn* - The native format for this barcode type.  The string
+  # consists of a series of "w" and "n" characters.  The first
+  # item is always a black line, with subsequent characters
+  # alternating between spaces and lines.  A "wide" item
+  # is twice the width of a "narrow" item.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
   #
-  #== Rendering
+  # == Rendering
   #
   # The standard w/n ratio seems to be 2:1.  There seem to be no real
   # standards for display.
@@ -62,7 +64,7 @@ module Barcode1DTools
   class Coop2of5 < Barcode1D
 
     # Character sequence - 0-based offset in this string is character
-    # number
+    # number.
     CHAR_SEQUENCE = "0123456789"
 
     # Patterns for making bar codes.  Note that the position
@@ -82,7 +84,9 @@ module Barcode1DTools
       '9'=> {'val'=>9 ,'wn'=>'wnwnn'}
     }
 
+    # Left guard pattern
     GUARD_PATTERN_LEFT_WN = 'wnw'
+    # Right guard pattern
     GUARD_PATTERN_RIGHT_WN = 'nww'
 
     DEFAULT_OPTIONS = {
@@ -94,11 +98,14 @@ module Barcode1DTools
     }
 
     class << self
-      # Coop2of5 can encode digits
+      # Coop2of5 can encode digits.  This will return
+      # true given a string of digits.
       def can_encode?(value)
         value.to_s =~ /\A[0-9]+\z/
       end
 
+      # Generates a check digit for a given value.  This uses a Luhn
+      # algorithm.
       def generate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value)
         mult = 3
@@ -106,13 +113,16 @@ module Barcode1DTools
         (10 - (value % 10)) % 10
       end
 
+      # Validates a check digit given a string of digits.  It is assumed
+      # that the last digit is the check digit.  Returns "true" if
+      # the check digit is correct.
       def validate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value)
         md = value.match(/^(\d+?)(\d)$/)
         self.generate_check_digit_for(md[1]) == md[2].to_i
       end
 
-      # Decode a string in rle format.  This will return a Coop2of5
+      # Decode a string in rle or w/n format.  This will return a Coop2of5
       # object.
       def decode(str, options = {})
         if str =~ /[^1-3]/ && str =~ /[^wn]/
@@ -163,6 +173,7 @@ module Barcode1DTools
 
     end
 
+    # Create a new Coop2of5 object with a given value.
     # Options are :line_character, :space_character, :w_character,
     # :n_character, :checksum_included, and :skip_checksum.
     def initialize(value, options = {})
@@ -195,17 +206,17 @@ module Barcode1DTools
       @wn ||= wn_str.tr('wn', @options[:w_character].to_s + @options[:n_character].to_s)
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       @rle ||= self.class.wn_to_rle(self.wn, @options)
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns 1s and 0s (for "black" and "white")
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

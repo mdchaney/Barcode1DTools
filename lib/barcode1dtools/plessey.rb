@@ -18,11 +18,12 @@ module Barcode1DTools
   # Plessey is a terrible symbology in modern terms and should
   # not be used in any new applications.
   #
-  # val = "2898289238AF"
-  # bc = Barcode1DTools::Plessey.new(val)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
+  # == Example
+  #  val = "2898289238AF"
+  #  bc = Barcode1DTools::Plessey.new(val)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
   #
   # The object created is immutable.
   #
@@ -37,27 +38,28 @@ module Barcode1DTools
   # The bits are ordered ascending, so 9 is 1001 binary,
   # "wn nw nw wn" in w/n format.
   #
+  # == Formats
   # There are three formats for the returned pattern:
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
-  #   wn -   The native format for this barcode type.  The string
-  #          consists of a series of "w" and "n" characters.  The first
-  #          item is always a black line, with subsequent characters
-  #          alternating between spaces and lines.  A "wide" item
-  #          is twice the width of a "narrow" item.
+  # *wn* - The native format for this barcode type.  The string
+  # consists of a series of "w" and "n" characters.  The first
+  # item is always a black line, with subsequent characters
+  # alternating between spaces and lines.  A "wide" item
+  # is twice the width of a "narrow" item.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
   #
-  #== Rendering
+  # == Rendering
   #
   # The author is aware of no standards for display.
 
@@ -87,7 +89,9 @@ module Barcode1DTools
       'F'=> {'val'=>15 ,'wn'=>'wnwnwnwn'}
     }
 
+    # Left guard pattern
     GUARD_PATTERN_LEFT_WN = 'wnwnnwwn'
+    # Right guard pattern
     GUARD_PATTERN_RIGHT_WN = 'wnwnnwnw'
 
     DEFAULT_OPTIONS = {
@@ -99,15 +103,20 @@ module Barcode1DTools
     }
 
     class << self
-      # Plessey can encode digits and A-F.
+      # Plessey can encode digits and A-F.  Returns "true" if the
+      # given value is encodable.
       def can_encode?(value)
         value.to_s =~ /\A[0-9A-F]+\z/
       end
 
+      # We don't generate check digits for Plessey, so this will raise
+      # an error.
       def generate_check_digit_for(value)
         raise NotImplementedError
       end
 
+      # We don't generate check digits for Plessey, so this will raise
+      # an error.
       def validate_check_digit_for(value)
         raise NotImplementedError
       end
@@ -162,8 +171,9 @@ module Barcode1DTools
 
     end
 
+    # Create a new Plessey barcode object with the given value.
     # Options are :line_character, :space_character, :w_character,
-    # :n_character, :checksum_included, and :skip_checksum.
+    # and :n_character.
     def initialize(value, options = {})
 
       @options = DEFAULT_OPTIONS.merge(options)
@@ -181,17 +191,17 @@ module Barcode1DTools
       @wn ||= wn_str.tr('wn', @options[:w_character].to_s + @options[:n_character].to_s)
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       @rle ||= self.class.wn_to_rle(self.wn, @options)
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns 1s and 0s (for "black" and "white")
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

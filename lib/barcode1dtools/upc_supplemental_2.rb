@@ -10,20 +10,20 @@ require 'barcode1dtools/upc_a'
 module Barcode1DTools
 
   # Barcode1DTools::UPC_Supplemental_2 - Create pattern for UPC
-  # Supplemental 2 barcodes
+  # Supplemental 2 barcodes.  The value encoded is an 2-digit
+  # integer, and a checksum digit will be added.  You can add the
+  # option :checksum_included => true when initializing to
+  # specify that you have already included a checksum.
   #
-  # The value encoded is an 2-digit integer, and a checksum digit
-  # will be added.  You can add the option :checksum_included => true
-  # when initializing to specify that you have already included a
-  # checksum.
+  # == Example
+  #  num = '24'
+  #  bc = Barcode1DTools::UPC_Supplemental_2.new(num)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
+  #  check_digit = Barcode1DTools::UPC_E.generate_check_digit_for(num)
   #
-  # num = '24'
-  # bc = Barcode1DTools::UPC_Supplemental_2.new(num)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
-  # check_digit = Barcode1DTools::UPC_E.generate_check_digit_for(num)
-  #
+  # == Other Information
   # This type of barcode consists of 2 digits, and a check digit
   # (simply a modulus 4 of the number encoded) that is encoded in
   # the "parity" of the two barcode digits.  The bar patterns are the
@@ -37,7 +37,27 @@ module Barcode1DTools
   # will likely need to use the Barcode::UPC_A module in addition
   # to this one to create the full code.
   #
-  #== Rendering
+  # == Formats
+  # There are two formats for the returned pattern (wn format is
+  # not available):
+  #
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
+  #
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
+  #
+  # The "width" method will tell you the total end-to-end width, in
+  # units, of the entire barcode.
+  #
+  # Unlike some of the other barcodes, e.g. Code 3 of 9, there is no "w/n" format for
+  # EAN & UPC style barcodes because the bars and spaces are variable width from
+  # 1 to 4 units.
+  # 
+  # == Rendering
   #
   # The 2-digit supplement is positioned to the right of the main UPC
   # code, and the human-readable digits are usually printed above the
@@ -52,11 +72,13 @@ module Barcode1DTools
 
   class UPC_Supplemental_2 < Barcode1D
 
+    # The bar patterns are the left bar patterns of UPC-A/EAN-13
     LEFT_PATTERNS = UPC_A::LEFT_PATTERNS
+    # The rle bar patterns are the left bar patterns of UPC-A/EAN-13
     LEFT_PATTERNS_RLE = UPC_A::LEFT_PATTERNS_RLE
 
-    # parity patterns, essentially binary counting where "e" is "1"
-    # and "o" is "0"
+    # Parity patterns, essentially binary counting where "e" is "1"
+    # and "o" is "0".
     PARITY_PATTERNS = {
       '0' => 'oo',
       '1' => 'oe',
@@ -64,9 +86,13 @@ module Barcode1DTools
       '3' => 'ee',
     };
 
+    # Left guard pattern
     LEFT_GUARD_PATTERN = '1011'
+    # Middle guard pattern
     MIDDLE_GUARD_PATTERN = '01'
+    # Left guard pattern as an rle
     LEFT_GUARD_PATTERN_RLE = '112'
+    # Middle guard pattern as an rle
     MIDDLE_GUARD_PATTERN_RLE = '11'
 
     DEFAULT_OPTIONS = {
@@ -93,7 +119,7 @@ module Barcode1DTools
         value.to_i % 4
       end
 
-      # validates the check digit given a string - assumes check digit
+      # Validates the check digit given a string - assumes check digit
       # is last digit of string.
       def validate_check_digit_for(value)
         raise UnencodableCharactersError unless self.can_encode?(value, :checksum_included => true)
@@ -101,6 +127,8 @@ module Barcode1DTools
         self.generate_check_digit_for(md[1]) == md[2].to_i
       end
 
+      # Decodes a bar or rle pattern and returns a
+      # UPC_Supplemental_2 object.
       def decode(str)
         if str.length == 20
           # bar pattern
@@ -156,6 +184,7 @@ module Barcode1DTools
 
     end
 
+    # Create a new UPC_Supplemental_2 object from a given value.
     # Options are :line_character, :space_character, and
     # :checksum_included.
     def initialize(value, options = {})
@@ -178,12 +207,13 @@ module Barcode1DTools
       end
     end
 
-    # not usable with EAN-style codes
+    # W/N patterns are not usable with EAN-style codes.  This
+    # will raise an error.
     def wn
       raise NotImplementedError
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation.
     def rle
       if @rle
         @rle
@@ -193,12 +223,12 @@ module Barcode1DTools
       end
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns a bar pattern.
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code.
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

@@ -19,11 +19,12 @@ module Barcode1DTools
   # Code 11 is used in the telecom industry for equipment
   # labeling.  It should not be used in any new applications.
   #
-  # val = "29382-38"
-  # bc = Barcode1DTools::Code11.new(val)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
+  # ==Example
+  #  val = "29382-38"
+  #  bc = Barcode1DTools::Code11.new(val)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
   #
   # The object created is immutable.
   #
@@ -35,27 +36,28 @@ module Barcode1DTools
   # space between them.  Three of the characters- 0, 9, and "-" -
   # are 6 units wide.  The rest are 7 units wide.
   #
+  # == Formats
   # There are three formats for the returned pattern:
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
-  #   wn -   The native format for this barcode type.  The string
-  #          consists of a series of "w" and "n" characters.  The first
-  #          item is always a black line, with subsequent characters
-  #          alternating between spaces and lines.  A "wide" item
-  #          is twice the width of a "narrow" item.
+  # *wn* - The native format for this barcode type.  The string
+  # consists of a series of "w" and "n" characters.  The first
+  # item is always a black line, with subsequent characters
+  # alternating between spaces and lines.  A "wide" item
+  # is twice the width of a "narrow" item.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
   #
-  #== Rendering
+  # == Rendering
   #
   # The standard w/n ratio seems to be 2:1.  There seem to be no real
   # standards for display.
@@ -81,6 +83,7 @@ module Barcode1DTools
       '-'=> {'val'=>10 ,'wn'=>'nnwnn'}
     }
 
+    # Guard pattern for Code 11
     GUARD_PATTERN_WN = 'nnwwn'
 
     DEFAULT_OPTIONS = {
@@ -91,14 +94,16 @@ module Barcode1DTools
       :wn_ratio => '2'
     }
 
-    attr_reader :start_character, :stop_character, :payload
-
     class << self
+      # Returns true if the value presented can be encoded in Code 11.
       # Code11 can encode digits and dashes.
       def can_encode?(value)
         value.to_s =~ /\A[0-9\-]+\z/
       end
 
+      # Generates a check digit for the given value.  Note that Code 11
+      # barcodes may have two check digits if the size of the value is
+      # 10 or more characters.
       def generate_check_digit_for(value)
         mult = 0
         sum_c = value.to_s.reverse.split('').inject(0) { |a,c| mult = (mult == 11 ? 1 : mult + 1); a + mult * PATTERNS[c]['val'] }
@@ -113,11 +118,16 @@ module Barcode1DTools
         "#{check_c}#{check_k}"
       end
 
+      # Returns true if the given check digit(s) is correct.
+      # The check digit is the last one or two characters of
+      # the value that is passed.
       def validate_check_digit_for(value)
         payload, check_digits = split_payload_and_check_digits(value)
         self.generate_check_digit_for(payload) == check_digits
       end
 
+      # Split the given value into a payload and check digit or
+      # digits.
       def split_payload_and_check_digits(value)
         if value.to_s.size > 11
           # two check digits
@@ -180,6 +190,7 @@ module Barcode1DTools
 
     end
 
+    # Create a new Code 11 object with a value.
     # Options are :line_character, :space_character, :w_character,
     # :n_character, :checksum_included, and :skip_checksum.
     def initialize(value, options = {})
@@ -211,17 +222,17 @@ module Barcode1DTools
       @wn ||= wn_str.tr('wn', @options[:w_character].to_s + @options[:n_character].to_s)
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       @rle ||= self.class.wn_to_rle(self.wn, @options)
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns the bar/space pattern as 1s and 0s.
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end

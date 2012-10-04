@@ -21,11 +21,12 @@ module Barcode1DTools
   # MSI is a terrible symbology in modern terms and should
   # not be used in any new applications.
   #
-  # val = "2898289238"
-  # bc = Barcode1DTools::MSI.new(val)
-  # pattern = bc.bars
-  # rle_pattern = bc.rle
-  # width = bc.width
+  # == Example
+  #  val = "2898289238"
+  #  bc = Barcode1DTools::MSI.new(val)
+  #  pattern = bc.bars
+  #  rle_pattern = bc.rle
+  #  width = bc.width
   #
   # The object created is immutable.
   #
@@ -40,27 +41,28 @@ module Barcode1DTools
   # The bits are ordered descending, so 9 is 1001 binary,
   # "wn nw nw wn" in w/n format.
   #
+  # == Formats
   # There are three formats for the returned pattern:
   #
-  #   bars - 1s and 0s specifying black lines and white spaces.  Actual
-  #          characters can be changed from "1" and 0" with options
-  #          :line_character and :space_character.
+  # *bars* - 1s and 0s specifying black lines and white spaces.  Actual
+  # characters can be changed from "1" and 0" with options
+  # :line_character and :space_character.
   #
-  #   rle -  Run-length-encoded version of the pattern.  The first
-  #          number is always a black line, with subsequent digits
-  #          alternating between spaces and lines.  The digits specify
-  #          the width of each line or space.
+  # *rle* - Run-length-encoded version of the pattern.  The first
+  # number is always a black line, with subsequent digits
+  # alternating between spaces and lines.  The digits specify
+  # the width of each line or space.
   #
-  #   wn -   The native format for this barcode type.  The string
-  #          consists of a series of "w" and "n" characters.  The first
-  #          item is always a black line, with subsequent characters
-  #          alternating between spaces and lines.  A "wide" item
-  #          is twice the width of a "narrow" item.
+  # *wn* - The native format for this barcode type.  The string
+  # consists of a series of "w" and "n" characters.  The first
+  # item is always a black line, with subsequent characters
+  # alternating between spaces and lines.  A "wide" item
+  # is twice the width of a "narrow" item.
   #
   # The "width" method will tell you the total end-to-end width, in
   # units, of the entire barcode.
   #
-  #== Rendering
+  # == Rendering
   #
   # The author is aware of no standards for display.
 
@@ -84,7 +86,9 @@ module Barcode1DTools
       '9'=> {'val'=>9 ,'wn'=>'wnnwnwwn'}
     }
 
+    # Left guard pattern
     GUARD_PATTERN_LEFT_WN = 'wn'
+    # Right guard pattern
     GUARD_PATTERN_RIGHT_WN = 'nwn'
 
     DEFAULT_OPTIONS = {
@@ -98,11 +102,13 @@ module Barcode1DTools
     }
 
     class << self
-      # MSI can encode digits
+      # MSI can encode digits - returns true if given a string of digits.
       def can_encode?(value)
         value.to_s =~ /\A\d+\z/
       end
 
+      # Generates a check digit using one of four algorithms.  The algorithm
+      # must be specified in the second parameter (the options hash).
       def generate_check_digit_for(value, options = {})
         if options[:check_digit] == 'mod 10'
           generate_mod10_check_digit_for(value).to_s
@@ -119,11 +125,13 @@ module Barcode1DTools
         end
       end
 
+      # Validates the check digit(s) for a given string.
       def validate_check_digit_for(value, options = {})
         payload, check_digits = split_payload_and_check_digits(value, options)
         self.generate_check_digit_for(payload, options) == check_digits
       end
 
+      # Splits payload and check digit(s) given a check_digit option.
       def split_payload_and_check_digits(value, options = {})
         if options[:check_digit] == 'mod 1010' || options[:check_digit] == 'mod 1110'
           md = value.to_s.match(/\A(.*?)(..)\z/)
@@ -133,6 +141,7 @@ module Barcode1DTools
         [md[1], md[2]]
       end
 
+      # Generates a mod 10 check digit.
       def generate_mod10_check_digit_for(value)
         value = value.to_s
         valarr = value.scan(/\d\d?/)
@@ -148,6 +157,7 @@ module Barcode1DTools
         (10 - ((odd + even) % 10)) % 10
       end
 
+      # Generates a mod 11 check digit.
       def generate_mod11_check_digit_for(value, style)
         max = (style == 'ncr' ? 9 : 7)
         value = value.to_s
@@ -206,8 +216,10 @@ module Barcode1DTools
 
     end
 
+    # Create a new MSI object with a given value.
     # Options are :line_character, :space_character, :w_character,
-    # :n_character, :checksum_included, and :skip_checksum.
+    # :n_character, :check_digit, :checksum_included, and
+    # :skip_checksum.
     def initialize(value, options = {})
 
       @options = DEFAULT_OPTIONS.merge(options)
@@ -235,17 +247,17 @@ module Barcode1DTools
       @wn ||= wn_str.tr('wn', @options[:w_character].to_s + @options[:n_character].to_s)
     end
 
-    # returns a run-length-encoded string representation
+    # Returns a run-length-encoded string representation
     def rle
       @rle ||= self.class.wn_to_rle(self.wn, @options)
     end
 
-    # returns 1s and 0s (for "black" and "white")
+    # Returns 1s and 0s (for "black" and "white")
     def bars
       @bars ||= self.class.rle_to_bars(self.rle, @options)
     end
 
-    # returns the total unit width of the bar code
+    # Returns the total unit width of the bar code
     def width
       @width ||= rle.split('').inject(0) { |a,c| a + c.to_i }
     end
