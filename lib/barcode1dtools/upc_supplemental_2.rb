@@ -21,7 +21,7 @@ module Barcode1DTools
   #  pattern = bc.bars
   #  rle_pattern = bc.rle
   #  width = bc.width
-  #  check_digit = Barcode1DTools::UPC_E.generate_check_digit_for(num)
+  #  check_digit = Barcode1DTools::UPC_Supplemental_2.generate_check_digit_for(num)
   #
   # == Other Information
   # This type of barcode consists of 2 digits, and a check digit
@@ -66,7 +66,7 @@ module Barcode1DTools
   # UPC-A is 95 units wide, so the gap is 24 units wide.  The
   # supplemental barcode is 20 units wide.  The author hasn't viewed
   # the specification, but note that the UPC (and more generally EAN)
-  # barcode system never a bar or space of more than four units
+  # barcode system never include a bar or space of more than four units
   # width.  Given that, the gap should likely be at last 10 units
   # wide.
 
