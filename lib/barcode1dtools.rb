@@ -211,8 +211,6 @@ module Barcode1DTools
         rle_str.tr('123456789', 'nwwwwwwww').tr('wn', wn_pair(options))
       end
 
-      private
-
       # Get an "wn" pair from the options
       def wn_pair(options = {})
         (options[:w_character] || 'w') + (options[:n_character] || 'n')
