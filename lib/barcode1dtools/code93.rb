@@ -1,3 +1,5 @@
+# encoding: ASCII-8BIT
+
 #--
 # Copyright 2012 Michael Chaney Consulting Corporation
 #

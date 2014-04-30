@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'barcode1dtools'
-  s.version     = '1.0.2.0'
+  s.version     = '1.0.2.1'
   s.licenses    = ['MIT', 'GPL-2']
   s.platform    = Gem::Platform::RUBY
   s.date        = '2012-10-03'
