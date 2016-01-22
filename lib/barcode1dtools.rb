@@ -11,7 +11,7 @@
 #
 # Author::    Michael Chaney (mdchaney@michaelchaney.com)
 # Copyright:: Copyright (c) 2012 Michael Chaney Consulting Corporation
-# License::   Diestributed under the terms of the MIT License of the GNU General Public License v. 2
+# License::   Distributed under the terms of the MIT License or the GNU General Public License v. 2
 #
 # == Example
 #  ean13 = Barcode1DTools::EAN13.new('0012676510226', :line_character => 'x', :space_character => ' ')
